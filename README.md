@@ -10,5 +10,8 @@ It'll read the passwords in file(named wordlist) and then use pptpsetup to conne
 The time interval is 10 seconds.
 
 
+### portscan.py
 
+Use to scan port.
 
+The timeout is 3 seconds.
