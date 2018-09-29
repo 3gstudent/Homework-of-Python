@@ -27,11 +27,11 @@ def test_vpn(ip,name,password):
 		return False
 if __name__ == '__main__':
 	if len(sys.argv)<3:
-    	print '[!]Wrong parameter'
+	print '[!]Wrong parameter'
 		print 'Usage:'
 		print '	pptp_password_hack.py <ip> <user>'
-        sys.exit(0)
-    else:
+		sys.exit(0)
+	else:
 		file_object = open('wordlist', 'r')
 		for line in file_object:
 			test_vpn(sys.argv[1],sys.argv[2],line)
