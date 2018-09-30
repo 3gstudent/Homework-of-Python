@@ -7,7 +7,7 @@ def scan(ip,port):
     server.settimeout(Timeout)
     try:
         server.connect((ip,port))
-        print('%s:%s'%(ip,port))
+        print '%s:%s'%(ip,port)
     except Exception as err:
         print('%s'%(ip))
     finally:
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     if len(sys.argv)!=4:
     	print '[!]Wrong parameter'
 	print 'Usage:'
-	print '	portscan.py <port> <BeginIP> <EndIP>'
+	print '%s <port> <BeginIP> <EndIP>'%(sys.argv[0])
         sys.exit(0)
     else:
         Port = int(sys.argv[1])
