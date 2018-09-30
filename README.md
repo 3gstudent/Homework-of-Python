@@ -15,3 +15,8 @@ The time interval is 10 seconds.
 Use to scan port.
 
 The timeout is 3 seconds.
+
+c++ version：
+
+https://github.com/3gstudent/Homework-of-C-Language/blob/master/portscan.cpp
+
