@@ -18,7 +18,7 @@ if __name__ == '__main__':
     	print '[!]Wrong parameter'
 	print 'Usage:'
 	print '%s <port> <BeginIP> <EndIP>'%(sys.argv[0])
-        sys.exit(0)
+	sys.exit(0)
     else:
         Port = int(sys.argv[1])
         BeginIP = sys.argv[2]
