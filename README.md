@@ -20,3 +20,9 @@ c++ version：
 
 https://github.com/3gstudent/Homework-of-C-Language/blob/master/portscan.cpp
 
+### urltoip.py
+
+Use to get ip from url.
+
+I can use the result of Sublist3r directly.
+
