@@ -3,9 +3,9 @@ import sys
 def urltoip(urlpath):
   with open(urlpath,'r') as f:
     for line in f.readlines():
-      print('[+]'+ line.strip('\n')),
+      print('[+]'+ line.strip('\r\n')),
       try:
-        host = gethostbyname(line.strip('\n'))
+        host = gethostbyname(line.strip('\r\n'))
       except Exception as e:
         with open('error.txt','a+') as ERR:
           ERR.write(line.strip()+ '\n')
