@@ -8,12 +8,12 @@ def urltoip(urlpath):
         host = gethostbyname(line.strip('\r\n'))
       except Exception as e:
         with open('error.txt','a+') as ERR:
-          ERR.write(line.strip()+ '\n')
+          ERR.write(line.strip()+ '\r\n')
           print('error')
       else:
         with open('result.txt','a+') as r:
-          r.write(line.strip('\n') + ' ')
-          r.write(host + '\n')
+          r.write(line.strip('\r\n') + ' ')
+          r.write(host + '\r\n')
           print(host)
   print("[*]done")          
 
