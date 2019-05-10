@@ -32,6 +32,8 @@ Use to remove duplicate ip from the result of Sublist3r.
 
 I can use the result of urltoip.py directly.
 
+The IP can be sorted by using Sublime(F9).
+
 ### file_deduplication.py
 
 Use to remove duplicate items from file.
