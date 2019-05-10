@@ -26,6 +26,12 @@ Use to get ip from url.
 
 I can use the result of Sublist3r directly.
 
+### file_deduplication(For_urltoip).py
+
+Use to remove duplicate ip from the result of Sublist3r.
+
+I can use the result of urltoip.py directly.
+
 ### file_deduplication.py
 
 Use to remove duplicate items from file.
