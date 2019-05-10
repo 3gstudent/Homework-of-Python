@@ -1,5 +1,5 @@
-import shutil
-def filededuplication(path)
+import shutil,sys
+def filededuplication(path):
   lines_seen = set()
   outfile=open(path+"new","w")
   f = open(path,"r")
