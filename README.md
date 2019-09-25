@@ -43,3 +43,8 @@ Use to remove duplicate items from file.
 Reference:
 
 https://pentest.com.tr/exploits/DEFCON-Webmin-1920-Unauthenticated-Remote-Command-Execution.html
+
+### fofa_api.py
+
+Used to call fofa's api and print the IP from the results.
+
