@@ -48,3 +48,10 @@ https://pentest.com.tr/exploits/DEFCON-Webmin-1920-Unauthenticated-Remote-Comman
 
 Used to call fofa's api and print the IP from the results.
 
+You can get 100 results.
+
+### fofa_api_VIP.py
+
+Used to call fofa's api and print the IP from the results.
+
+If you're VIP,you'll get 10000 results.
