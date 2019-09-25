@@ -55,3 +55,9 @@ You can get 100 results.
 Used to call fofa's api and print the IP from the results.
 
 If you're VIP,you'll get 10000 results.
+
+### vBulletin_5.x_0day_pre-auth_RCE.py
+
+Reference:
+
+https://seclists.org/fulldisclosure/2019/Sep/31
