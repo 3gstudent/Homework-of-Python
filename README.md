@@ -61,3 +61,10 @@ If you're VIP,you'll get 10000 results.
 Reference:
 
 https://seclists.org/fulldisclosure/2019/Sep/31
+
+### phpStudy_5.2-5.45_(php_xmlrpc.dll)_backdoor_RCE.py
+
+Reference:
+
+https://mp.weixin.qq.com/s/dTzWfYGdkNqEl0vd72oC2w
+
