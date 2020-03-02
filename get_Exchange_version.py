@@ -62,7 +62,7 @@ def buildnumber_to_version(BuildNumber):
 def get_exchange_buildnumber(url):
     try:
         
-        r = requests.post(url, verify = False)
+        r = requests.get(url, verify = False)
         nPos1 = r.text.index('href="')       
         str1 = r.text[nPos1+9:nPos1+40]
         nPos2 = str1.index('/')
