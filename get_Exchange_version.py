@@ -63,9 +63,13 @@ def get_exchange_buildnumber(url):
     try:
         
         r = requests.post(url, verify = False)
-        nPos1 = r.text.index('<link rel="shortcut icon" href="/owa/')
-        nPos2 = r.text.index('themes/resources/favicon.ico')
-        BuildNumber = r.text[nPos1+37:nPos2-1]
+        nPos1 = r.text.index('href="')       
+        str1 = r.text[nPos1+9:nPos1-9+48]
+        nPos2 = str1.index('/')
+        nPos3 = str1.index('/themes/')
+        str2 = str1[nPos2:nPos3]
+        nPos4 = str2.rindex('/')
+        BuildNumber = str2[nPos4+1:]
         print('Build number:%s'%(BuildNumber))
         result = buildnumber_to_version(BuildNumber)
         print(result)
