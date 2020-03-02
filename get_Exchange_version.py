@@ -64,7 +64,7 @@ def get_exchange_buildnumber(url):
         
         r = requests.post(url, verify = False)
         nPos1 = r.text.index('href="')       
-        str1 = r.text[nPos1+9:nPos1-9+48]
+        str1 = r.text[nPos1+9:nPos1+40]
         nPos2 = str1.index('/')
         nPos3 = str1.index('/themes/')
         str2 = str1[nPos2:nPos3]
