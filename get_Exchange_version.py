@@ -1,4 +1,5 @@
 import requests
+import sys
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -78,5 +79,13 @@ def get_exchange_buildnumber(url):
          print('[!]Error:%s'%e)
 
 if __name__ == '__main__':
-    get_exchange_buildnumber('https://mail.test.com')
-
+    if len(sys.argv)!=2:
+        print '[!]Wrong parameter'
+        print 'Usage:'
+        print '%s <url>'%(sys.argv[0])
+        print 'Eg.'
+        print '%s https://mail.test.com'%(sys.argv[0])
+        sys.exit(0)
+    else:
+        get_exchange_buildnumber(sys.argv[1])
+    
