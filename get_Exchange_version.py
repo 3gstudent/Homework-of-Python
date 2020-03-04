@@ -84,7 +84,7 @@ if __name__ == '__main__':
         print('Usage:')
         print('%s <url>'%(sys.argv[0]))
         print('Eg.')
-        print('%s https://mail.test.com'%(sys.argv[0]))
+        print('%s https://mail.test.com/owa'%(sys.argv[0]))
         sys.exit(0)
     else:
         get_exchange_buildnumber(sys.argv[1])
