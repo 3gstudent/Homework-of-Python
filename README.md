@@ -94,5 +94,10 @@ Reference:
 
 https://docs.microsoft.com/en-us/Exchange/new-features/build-numbers-and-release-dates?redirectedfrom=MSDN&view=exchserver-2019
 
+### SMBv3_RCE_Scanner(CVE-2020-0796).py
+
+Use to scan the SMBv3 RCE vulnerability.
+
+The timeout is 3 seconds.
 
 
