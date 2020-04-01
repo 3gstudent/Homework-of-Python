@@ -100,4 +100,20 @@ Use to scan the SMBv3 RCE vulnerability.
 
 The timeout is 3 seconds.
 
+### Unauthenticated_RCE_in_Draytek_Vigor2960\3900\300B.py
+
+Reference:
+
+https://github.com/imjdl/CVE-2020-8515-PoC
+
+CVE-2020-8515
+
+DrayTek Vigor2960 1.3.1_Beta, Vigor3900 1.4.4_Beta, and Vigor300B 1.3.3_Beta, 1.4.2.1_Beta, and 1.4.4_Beta devices allow remote code execution as root (without authentication) via shell metacharacters to the cgi-bin/mainfunction.cgi URI..
+
+Affected Products:
+- Vigor300B <v1.5.1
+- Vigor2960 <v1.5.1
+- Vigor3900 <v1.5.1
+
+
 
