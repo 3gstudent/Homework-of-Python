@@ -142,6 +142,7 @@ Support command of low token:
   
 Support command of admin token: 
 
+- GetAllDomains
 - GetAllMailboxes
 - GetAllAccounts
 - GetAllAdminAccounts
