@@ -135,9 +135,10 @@ def getalldomains_request(uri,token):
       print("[*] Try to get all domain names")
       r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
       if "name" in r.text:
-        pattern_config = re.compile(r"zimbraDomainName\">(.*?)<")
-        config = pattern_config.findall(r.text)[0]
-        print("[+] Domain name: "+config)
+        pattern_name = re.compile(r"zimbraDomainName\">(.*?)<")
+        name = pattern_name.findall(r.text)
+        for i in range(len(name)):       
+          print("[+] Domain name: %s"%(name[i]))
       else:
         print("[!]")
         print(r.text)
