@@ -8,9 +8,7 @@ except ImportError:
     from httplib import HTTPConnection, HTTPSConnection, ResponseNotReady
 from impacket import ntlm
 
-
-
-def checkEWS(host, port, mode, domain, user, data,command):
+def ewsManage(host, port, mode, domain, user, data,command):
 
     if command == "getfolderofinbox":
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -49,8 +47,6 @@ def checkEWS(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
-
-
     elif command =='listmailofinbox':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -71,8 +67,6 @@ def checkEWS(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
-
-
 
     elif command =='listmailofsentitems':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -231,7 +225,7 @@ if __name__ == '__main__':
         print('%s test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox'%(sys.argv[0]))
         sys.exit(0)
     else:
-        checkEWS(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+        ewsManage(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
 
 
 
