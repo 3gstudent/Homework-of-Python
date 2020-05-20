@@ -150,8 +150,27 @@ Support command of admin token:
 - GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com
 - getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com
 
+### checkEWS.py
 
+Use to check the valid account of Exchange Web Service(Support plaintext and ntlmhash)
 
+Reference:https://github.com/dirkjanm/PrivExchange/blob/master/privexchange.py
+
+Usage:
+
+```
+checkEWS.py <host> <port> <mode> <domain> <user> <password>
+<mode>:
+- plaintext
+- ntlmhash
+```
+
+Eg.
+
+```
+checkEWS.py 192.168.1.1 443 plaintext test.com user1 password1
+checkEWS.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1
+```
 
   
   
