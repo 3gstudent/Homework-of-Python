@@ -1,12 +1,7 @@
 import ssl
-import argparse
-import logging
 import sys
-import getpass
 import base64
 import re
-import binascii
-import xml.etree.ElementTree as ET
 try:
     from http.client import HTTPConnection, HTTPSConnection, ResponseNotReady
 except ImportError:
