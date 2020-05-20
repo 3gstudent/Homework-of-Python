@@ -172,5 +172,33 @@ checkEWS.py 192.168.1.1 443 plaintext test.com user1 password1
 checkEWS.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1
 ```
 
+### ewsManage.py   
   
-  
+Use to access Exchange Web Service(Support plaintext and ntlmhash)
+
+Reference:https://github.com/dirkjanm/PrivExchange/blob/master/privexchange.py
+
+Usage:
+
+```
+ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
+<mode>:
+- plaintext
+- ntlmhash
+<command>:
+- getfolderofinbox
+- getfolderofsentitems
+- listmailofinbox
+- listmailofsentitems
+- saveattachment
+
+```
+Eg.
+
+```
+ewsManage.py 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox
+ewsManage.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox
+```
+
+
+
