@@ -188,6 +188,7 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - getfolderofsentitems
 - listmailofinbox
 - listmailofsentitems
+- getmail
 - getattachment
 - saveattachment
 
