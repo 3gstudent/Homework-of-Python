@@ -89,6 +89,33 @@ def ewsManage(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
+
+    elif command =='getattachment':    
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetItem>
+      <m:ItemShape>
+        <t:BaseShape>IdOnly</t:BaseShape>
+        <t:AdditionalProperties>
+          <t:FieldURI FieldURI="item:Attachments" />
+        </t:AdditionalProperties>
+      </m:ItemShape>
+      <m:ItemIds>
+        <t:ItemId Id="{id}" />
+      </m:ItemIds>
+    </m:GetItem>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+        Id = input("Input the ItemId of the Message who has Attachments:")
+        POST_BODY = POST_BODY.format(id=Id)
+
+
     elif command =='saveattachment':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -104,7 +131,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
-        Id = input("Input the Id:")
+        Id = input("Input the Id of the attachment:")
         POST_BODY = POST_BODY.format(id=Id)
 
     else:    
@@ -195,9 +222,43 @@ def ewsManage(host, port, mode, domain, user, data,command):
     else:
         print('[+] Valid:%s %s'%(user,data))       
         #print(body)
-        print('[+] Out file:%s'%(filename))
+        print('[+] Save response file to %s'%(filename))
         with open(filename, 'w+') as file_object:
             file_object.write(bytes.decode(body))
+        if res.status == 200:
+            if command =='getattachment':
+                responsecode_name = re.compile(r"<m:ResponseCode>(.*?)</m:ResponseCode>")
+                responsecode = responsecode_name.findall(bytes.decode(body))
+                if responsecode[0] =='NoError':
+                    pattern_name = re.compile(r"<t:Name>(.*?)</t:Name>")
+                    name = pattern_name.findall(bytes.decode(body))
+                    for i in range(len(name)):       
+                        print("[+] Attachment name: %s"%(name[i]))
+
+            elif command =='saveattachment':
+                responsecode_name = re.compile(r"<m:ResponseCode>(.*?)</m:ResponseCode>")
+                responsecode = responsecode_name.findall(bytes.decode(body))
+                if responsecode[0] =='NoError':
+                    pattern_name = re.compile(r"<t:Name>(.*?)</t:Name>")
+                    name = pattern_name.findall(bytes.decode(body))
+                    print('[+] Save attachment to %s'%(name[0]))
+                    pattern_data = re.compile(r"<t:Content>(.*?)</t:Content>")
+                    attachmentdata = pattern_data.findall(bytes.decode(body))
+
+                    pattern_type = re.compile(r"<t:ContentType>(.*?)</t:ContentType>")
+                    contenttype = pattern_type.findall(bytes.decode(body))
+                    if 'text' in contenttype:
+                        truedata = base64.b64decode(attachmentdata[0])
+                        with open(name[0], 'w+') as file_object:
+                            file_object.write(truedata)
+                    else:
+                        truedata = base64.b64decode(attachmentdata[0])
+                        with open(name[0], 'wb+') as file_object:
+                            file_object.write(truedata)                   
+                          
+                else:
+                    print('[!] %s'%(responsecode[0]))    
+
         return True
 
 
@@ -218,6 +279,7 @@ if __name__ == '__main__':
         print('- getfolderofsentitems')  
         print('- listmailofinbox')
         print('- listmailofsentitems')
+        print('- getattachment')        
         print('- saveattachment')
 
         print('Eg.')
@@ -226,7 +288,3 @@ if __name__ == '__main__':
         sys.exit(0)
     else:
         ewsManage(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
-
-
-
-
