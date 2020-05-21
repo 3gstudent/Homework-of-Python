@@ -176,8 +176,6 @@ checkEWS.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1
   
 Use to access Exchange Web Service(Support plaintext and ntlmhash)
 
-Reference:https://github.com/dirkjanm/PrivExchange/blob/master/privexchange.py
-
 Usage:
 
 ```
