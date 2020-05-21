@@ -90,6 +90,30 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
 
 
+    elif command =='getmail':    
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetItem>
+      <m:ItemShape>
+        <t:BaseShape>AllProperties</t:BaseShape>
+        <t:BodyType>Text</t:BodyType>
+      </m:ItemShape>
+      <m:ItemIds>
+        <t:ItemId Id="{id}" ChangeKey="{key}" />
+      </m:ItemIds>
+    </m:GetItem>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+        Id = input("Input the ItemId of the Message:")
+        Key = input("Input the ChangeKey of the Message:")
+        POST_BODY = POST_BODY.format(id=Id, key=Key)
+
     elif command =='getattachment':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -279,6 +303,7 @@ if __name__ == '__main__':
         print('- getfolderofsentitems')  
         print('- listmailofinbox')
         print('- listmailofsentitems')
+        print('- getmail')         
         print('- getattachment')        
         print('- saveattachment')
 
