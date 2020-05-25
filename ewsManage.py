@@ -248,7 +248,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         print('[+] Valid:%s %s'%(user,data))       
         #print(body)
         print('[+] Save response file to %s'%(filename))
-        with open(filename, 'w+') as file_object:
+        with open(filename, 'w+', encoding='utf-8') as file_object:
             file_object.write(bytes.decode(body))
         if res.status == 200:
             if command =='getattachment':
