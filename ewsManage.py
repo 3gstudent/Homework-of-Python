@@ -2,6 +2,7 @@ import ssl
 import sys
 import base64
 import re
+import binascii
 try:
     from http.client import HTTPConnection, HTTPSConnection, ResponseNotReady
 except ImportError:
