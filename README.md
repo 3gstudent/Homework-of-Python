@@ -201,5 +201,24 @@ ewsManage.py 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox
 ewsManage.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox
 ```
 
+### sshCheck.py
+
+Use to check the valid credential of SSH(Support password and privatekeyfile)
+
+Usage:
+
+```
+sshCheck.py <host> <port> <mode><user> <password>
+<mode>:
+- plaintext
+- keyfile
+```
+
+Eg.
+
+```
+sshCheck.py 192.168.1.1 22 plaintext root toor
+sshCheck.py 192.168.1.1 22 keyfile root id_rsa
+```
 
 
