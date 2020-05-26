@@ -32,7 +32,7 @@ def sshcheckfile(hostname, port, username, keyfile):
 
 if __name__ == "__main__":
     if len(sys.argv)!=6:
-        print('[!]Wrong parameter')     
+        print('[!]Wrong parameter')
         print('sshCheck')       
         print('Use to check the valid credential of SSH(Support password and privatekeyfile)')
         print('Author:3gstudent')      
@@ -50,4 +50,6 @@ if __name__ == "__main__":
             sshcheck(sys.argv[1], int(sys.argv[2]), sys.argv[4], sys.argv[5])
         elif sys.argv[3] == 'keyfile': 
             sshcheckfile(sys.argv[1], int(sys.argv[2]), sys.argv[4], sys.argv[5])
+        else:
+            print('[!]Wrong parameter')
 
