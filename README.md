@@ -213,6 +213,13 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - getmail
 - getattachment
 - saveattachment
+- getdelegateofinbox
+- adddelegateofinbox
+- updatedelegateofinbox
+- removedelegateofinbox
+- getinboxrules
+- updateinboxrules
+- removeinboxrules
 
 ```
 
