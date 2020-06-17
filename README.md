@@ -275,3 +275,22 @@ sshRunCmd.py 192.168.1.1 22 keyfile root id_rsa ps
 
 ---
 
+### easCheck.py
+
+Use to check the valid credential of eas(Exchange Server ActiveSync)
+
+Usage:
+
+```
+easCheck.py <host> <user> <password>
+```
+
+Eg.
+
+```
+easCheck.py 192.168.1.1 user1 password1
+```
+
+
+
+
