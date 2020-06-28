@@ -211,6 +211,7 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - listmailofinbox
 - listmailofsentitems
 - getmail
+- deletemail
 - getattachment
 - saveattachment
 - getdelegateofinbox
