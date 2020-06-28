@@ -220,7 +220,8 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - getinboxrules
 - updateinboxrules
 - removeinboxrules
-
+- deleteattachment
+- createattachment
 ```
 
 Eg.
