@@ -1,3 +1,5 @@
+#!python3
+
 import ssl
 import sys
 import base64
@@ -154,6 +156,64 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         Id = input("Input the Id of the attachment:")
         POST_BODY = POST_BODY.format(id=Id)
+
+
+    elif command =='deleteattachment':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:DeleteAttachment>
+      <m:AttachmentIds>
+        <t:AttachmentId Id="{id}" />
+      </m:AttachmentIds>
+    </m:DeleteAttachment>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the attachment:")
+        POST_BODY = POST_BODY.format(id=Id)
+
+    elif command =='createattachment':    
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:CreateAttachment>
+      <m:ParentItemId Id="{id}" ChangeKey="{key}"/>
+      <m:Attachments>
+        <t:FileAttachment>
+          <t:Name>{name}</t:Name>
+          <t:Content>{data}</t:Content>
+        </t:FileAttachment>
+      </m:Attachments>
+    </m:CreateAttachment>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the ItemId of the Message:")
+        Key = input("Input the ChangeKey of the Message:")
+        Name = input("Input the name of the attachment file:")
+        Path = input("Input the path of the attachment file:")
+        Type = input("Input the type of the attachment file:(text or raw)")
+        if Type == 'text':
+          with open(Path, 'r') as file_obj:
+            content = file_obj.read()
+          content = content.encode("utf-8")
+        elif Type =='raw':
+          with open(Path, 'rb') as file_obj:
+            content = file_obj.read()         
+        else:
+                print('[!]Wrong parameter')
+                return False  
+       
+        base64content = base64.b64encode(content)
+        Data = str((base64content),'utf-8')
+        POST_BODY = POST_BODY.format(id=Id, key=Key, name=Name, data=Data)
 
     elif command =='getdelegateofinbox': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -487,7 +547,9 @@ if __name__ == '__main__':
         print('- removedelegateofinbox')
         print('- getinboxrules')
         print('- updateinboxrules')
-        print('- removeinboxrules')        
+        print('- removeinboxrules')
+        print('- deleteattachment')
+        print('- createattachment')
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox'%(sys.argv[0]))
         print('%s test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox'%(sys.argv[0]))
