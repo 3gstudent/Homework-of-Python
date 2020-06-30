@@ -31,6 +31,8 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
+
+
     elif command =='getfolderofsentitems': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -49,6 +51,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
+
 
     elif command =='listmailofinbox':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -71,6 +74,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
+
     elif command =='listmailofsentitems':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -91,6 +95,31 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
+
+    
+    elif command =='listmailoffolder':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:FindItem Traversal="Shallow">
+      <m:ItemShape>
+        <t:BaseShape>AllProperties</t:BaseShape>
+        <t:BodyType>Text</t:BodyType>
+      </m:ItemShape>
+      <m:IndexedPageItemView MaxEntriesReturned="2147483647" Offset="0" BasePoint="Beginning" />
+      <m:ParentFolderIds>
+        <t:FolderId Id="{id}" />
+      </m:ParentFolderIds>
+    </m:FindItem>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the Folder:")
+        POST_BODY = POST_BODY.format(id=Id)
+
 
     elif command =='getmail':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -134,6 +163,25 @@ def ewsManage(host, port, mode, domain, user, data,command):
         Id = input("Input the ItemId of the Message:")
         POST_BODY = POST_BODY.format(id=Id)
 
+    elif command =='deletefolder':    
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:DeleteFolder DeleteType="HardDelete" xmlns="https://schemas.microsoft.com/exchange/services/2006/messages">
+      <m:FolderIds>
+        <t:FolderId Id="{id}"/>
+      </m:FolderIds>
+    </m:DeleteFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the Folder:")
+        POST_BODY = POST_BODY.format(id=Id)
+
+
     elif command =='getattachment':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -157,6 +205,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         Id = input("Input the ItemId of the Message who has Attachments:")
         POST_BODY = POST_BODY.format(id=Id)
+
 
     elif command =='saveattachment':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -194,6 +243,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         Id = input("Input the Id of the attachment:")
         POST_BODY = POST_BODY.format(id=Id)
+
 
     elif command =='createattachment':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -233,6 +283,147 @@ def ewsManage(host, port, mode, domain, user, data,command):
         base64content = base64.b64encode(content)
         Data = str((base64content),'utf-8')
         POST_BODY = POST_BODY.format(id=Id, key=Key, name=Name, data=Data)
+
+
+    elif command =='createfolderofinbox':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:CreateFolder>
+      <m:ParentFolderId>
+        <t:DistinguishedFolderId Id="inbox" />
+      </m:ParentFolderId>
+      <m:Folders>
+        <t:Folder>
+          <t:DisplayName>{name}</t:DisplayName>
+        </t:Folder>
+      </m:Folders>
+    </m:CreateFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Name = input("Input the name of the new folder:")
+        POST_BODY = POST_BODY.format(name=Name)
+
+
+    elif command =='SetHiddenPropertyType':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetFolder>
+      <m:FolderShape>
+        <t:BaseShape>IdOnly</t:BaseShape>
+        <t:AdditionalProperties>
+          <t:ExtendedFieldURI PropertyTag="4340" PropertyType="Boolean" />
+        </t:AdditionalProperties>
+      </m:FolderShape>
+      <m:FolderIds>
+        <t:FolderId Id="{id}" ChangeKey="{key}" />
+      </m:FolderIds>
+    </m:GetFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the Folder:")
+        Key = input("Input the ChangeKey of the Folder:")
+        POST_BODY = POST_BODY.format(id=Id, key=Key)
+
+
+    elif command =='UpdateHiddenPropertyType':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateFolder>
+      <m:FolderChanges>
+        <t:FolderChange>
+          <t:FolderId Id="{id}" ChangeKey="{key}" />
+          <t:Updates>
+            <t:SetFolderField>
+              <t:ExtendedFieldURI PropertyTag="4340" PropertyType="Boolean" />
+              <t:Folder>
+                <t:ExtendedProperty>
+                  <t:ExtendedFieldURI PropertyTag="4340" PropertyType="Boolean" />
+                  <t:Value>true</t:Value>
+                </t:ExtendedProperty>
+              </t:Folder>
+            </t:SetFolderField>
+          </t:Updates>
+        </t:FolderChange>
+      </m:FolderChanges>
+    </m:UpdateFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the Folder:")
+        Key = input("Input the ChangeKey of the Folder:")
+        POST_BODY = POST_BODY.format(id=Id, key=Key)
+
+
+    elif command =='listhiddenfolderofinbox':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+   <m:FindFolder Traversal="Deep">
+      <m:FolderShape>
+        <t:BaseShape>IdOnly</t:BaseShape>
+        <t:AdditionalProperties>
+          <t:ExtendedFieldURI PropertyTag="4340" PropertyType="Boolean" />
+          <t:FieldURI FieldURI="folder:DisplayName" />
+        </t:AdditionalProperties>
+      </m:FolderShape>
+      <m:IndexedPageFolderView MaxEntriesReturned="100" Offset="0" BasePoint="Beginning" />
+      <m:Restriction>
+        <t:IsEqualTo>
+          <t:ExtendedFieldURI PropertyTag="4340" PropertyType="Boolean" />
+          <t:FieldURIOrConstant>
+            <t:Constant Value="true" />
+          </t:FieldURIOrConstant>
+        </t:IsEqualTo>
+      </m:Restriction>
+      <m:ParentFolderIds>
+        <t:DistinguishedFolderId Id="inbox" />
+      </m:ParentFolderIds>
+    </m:FindFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+
+    elif command =='createtestmail':          
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:CreateItem MessageDisposition="SaveOnly">
+      <m:SavedItemFolderId>
+        <t:FolderId Id="{id}" />
+      </m:SavedItemFolderId>
+      <m:Items>
+        <t:Message>
+          <t:Subject>test mail</t:Subject>
+        </t:Message>
+      </m:Items>
+    </m:CreateItem>
+  </soap:Body>
+</soap:Envelope>
+'''
+        Id = input("Input the Id of the Folder:")
+        POST_BODY = POST_BODY.format(id=Id)
+
 
     elif command =='getdelegateofinbox': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -557,9 +748,11 @@ if __name__ == '__main__':
         print('- getfolderofsentitems')  
         print('- listmailofinbox')
         print('- listmailofsentitems')
+        print('- listmailoffolder') 
         print('- getmail')
-        print('- deletemail')            
-        print('- getattachment')        
+        print('- deletemail')
+        print('- deletefolder')
+        print('- getattachment')
         print('- saveattachment')
         print('- getdelegateofinbox')
         print('- adddelegateofinbox')
@@ -570,6 +763,11 @@ if __name__ == '__main__':
         print('- removeinboxrules')
         print('- deleteattachment')
         print('- createattachment')
+        print('- createfolderofinbox')
+        print('- listhiddenfolderofinbox')
+        print('- createtestmail')
+        print('- SetHiddenPropertyType')               
+        print('- UpdateHiddenPropertyType')      
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox'%(sys.argv[0]))
         print('%s test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox'%(sys.argv[0]))
