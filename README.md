@@ -212,6 +212,7 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - listmailofsentitems
 - getmail
 - deletemail
+- deletefolder
 - getattachment
 - saveattachment
 - getdelegateofinbox
@@ -223,6 +224,12 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - removeinboxrules
 - deleteattachment
 - createattachment
+- createfolderofinbox
+- listhiddenfolderofinbox
+- createtestmail
+- SetHiddenPropertyType
+- UpdateHiddenPropertyType
+- listmailoffolder
 ```
 
 Eg.
