@@ -11,6 +11,9 @@ except ImportError:
     from httplib import HTTPConnection, HTTPSConnection, ResponseNotReady
 from impacket import ntlm
 
+
+AddressList = []
+
 def ewsManage(host, port, mode, domain, user, data,command):
 
     if command == "getfolderofinbox":
@@ -602,6 +605,61 @@ def ewsManage(host, port, mode, domain, user, data,command):
         RuleId = input("Input the rule ID:")
         POST_BODY = POST_BODY.format(id=RuleId)
 
+    elif command =='getcontact':    
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+      <m:FindPeople>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:ParentFolderId>
+            <t:DistinguishedFolderId Id="contacts"/>
+         </m:ParentFolderId>
+      </m:FindPeople>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+    elif command =='findpeople':   
+        print('[*]This operation can only be used on Exchange Server 2013 or newer version') 
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+      <m:FindPeople>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:ParentFolderId>
+            <t:DistinguishedFolderId Id="directory"/>
+         </m:ParentFolderId>
+         <m:QueryString>{string}</m:QueryString>
+      </m:FindPeople>
+  </soap:Body>
+</soap:Envelope>
+'''
+        QueryString = input("Input the QueryString:")
+        POST_BODY = POST_BODY.format(string=QueryString)
+
+    elif command =='resolvename':
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+     <m:ResolveNames ReturnFullContactData="false" SearchScope="ContactsActiveDirectory">
+      <m:UnresolvedEntry>{string}</m:UnresolvedEntry>
+    </m:ResolveNames>
+  </soap:Body>
+</soap:Envelope>
+'''
+        QueryString = input("Input the resolved entry:")
+        POST_BODY = POST_BODY.format(string=QueryString)
+
+
     else:    
         print('[!]Wrong parameter')
         return False
@@ -727,9 +785,265 @@ def ewsManage(host, port, mode, domain, user, data,command):
                 else:
                     print('[!] %s'%(responsecode[0]))
 
+            elif command =='findpeople':
+                responsecode_name = re.compile(r"<ResponseCode>(.*?)</ResponseCode>")
+                responsecode = responsecode_name.findall(bytes.decode(body))
+                if responsecode[0] =='NoError':
+                    pattern_name = re.compile(r"<Address>(.*?)</Address>")
+                    name = pattern_name.findall(bytes.decode(body))
+                    for i in range(len(name)): 
+                        data = name[i]
+                        x = data.find('<EmailAddress>')
+                        y = data.find('</EmailAddress>')
+                        data = data[x+14:y] 
+                        print("[+] EmailAddress: %s"%(data))
+
+            elif command =='resolvename':
+                responsecode_name = re.compile(r"<m:ResponseCode>(.*?)</m:ResponseCode>")
+                responsecode = responsecode_name.findall(bytes.decode(body))
+                pattern_name = re.compile(r"<t:EmailAddress>(.*?)</t:EmailAddress>")
+                name = pattern_name.findall(bytes.decode(body))
+                x = bytes.decode(body).find('TotalItemsInView')
+                y = bytes.decode(body).find('IncludesLastItemInRange')
+                if y==-1:
+                    print("[!] No results")
+                    return True  
+                size = bytes.decode(body)[x+18:y-2] 
+
+                print("[+] Total results: %s\r\n"%(size))
+                if size=='100':
+                    print("[!] Search results may be incomplete, need to add search criteria.")
+                    return True  
+
+                for i in range(len(name)):       
+                    print("[+] EmailAddress: %s"%(name[i]))
 
         return True
 
+def ewsManage_findallpeople(host, port, mode, domain, user, data,QueryString):
+    POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+      <m:FindPeople>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:ParentFolderId>
+            <t:DistinguishedFolderId Id="directory"/>
+         </m:ParentFolderId>
+         <m:QueryString>{string}</m:QueryString>
+      </m:FindPeople>
+  </soap:Body>
+</soap:Envelope>
+'''
+    POST_BODY = POST_BODY.format(string=QueryString)
+
+    ews_url = "/EWS/Exchange.asmx"
+    if port ==443:
+        try:
+            uv_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            session = HTTPSConnection(host, port, context=uv_context)
+        except AttributeError:
+            session = HTTPSConnection(host, port)
+    else:        
+        session = HTTPConnection(host, port)
+
+    # Use impacket for NTLM
+    ntlm_nego = ntlm.getNTLMSSPType1(host, domain)
+
+    #Negotiate auth
+    negotiate = base64.b64encode(ntlm_nego.getData())
+    # Headers
+    headers = {
+        "Authorization": 'NTLM %s' % negotiate.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("POST", ews_url, POST_BODY, headers)
+    res = session.getresponse()
+    res.read()
+    if res.status != 401:
+        print('Status code returned: %d. Authentication does not seem required for URL'%(res.status))
+        sys.exit(0)
+    try:
+        if 'NTLM' not in res.getheader('WWW-Authenticate'):
+            print('NTLM Auth not offered by URL, offered protocols: %s'%(res.getheader('WWW-Authenticate')))
+            sys.exit(0)
+    except (KeyError, TypeError):
+        print('No authentication requested by the server for url %s'%(ews_url))
+        sys.exit(0)
+
+    # Get negotiate data
+    try:
+        ntlm_challenge_b64 = re.search('NTLM ([a-zA-Z0-9+/]+={0,2})', res.getheader('WWW-Authenticate')).group(1)
+        ntlm_challenge = base64.b64decode(ntlm_challenge_b64)
+    except (IndexError, KeyError, AttributeError):
+        print('No NTLM challenge returned from server')
+        sys.exit(0)
+
+    if mode =='plaintext':
+        password1 = data;
+        nt_hash = ''
+
+    elif mode =='ntlmhash':
+        password1 = ''
+        nt_hash = binascii.unhexlify(data)
+
+    else:
+        print('[!]Wrong parameter')
+        sys.exit(0)
+
+    lm_hash = ''    
+    ntlm_auth, _ = ntlm.getNTLMSSPType3(ntlm_nego, ntlm_challenge, user, password1, domain, lm_hash, nt_hash)
+    auth = base64.b64encode(ntlm_auth.getData())
+
+    headers = {
+        "Authorization": 'NTLM %s' % auth.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("POST", ews_url, POST_BODY, headers)
+    res = session.getresponse()
+    body = res.read()
+
+    if res.status == 401: 
+        print('[!] Server returned HTTP status 401 - authentication failed')          
+        sys.exit(0)
+
+    else:       
+        if res.status == 200: 
+            responsecode_name = re.compile(r"<ResponseCode>(.*?)</ResponseCode>")
+            responsecode = responsecode_name.findall(bytes.decode(body))
+            if responsecode[0] =='NoError':
+                pattern_name = re.compile(r"<Address>(.*?)</Address>")
+                name = pattern_name.findall(bytes.decode(body))
+                name = list(set(name))                
+                for i in range(len(name)): 
+                    data = name[i]
+                    x = data.find('<EmailAddress>')
+                    y = data.find('</EmailAddress>')
+                    data = data[x+14:y]
+                    AddressList.append(data)
+        return True
+
+
+def ewsManage_resolveallname(host, port, mode, domain, user, data,QueryString):
+    POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+     <m:ResolveNames ReturnFullContactData="false" SearchScope="ContactsActiveDirectory">
+      <m:UnresolvedEntry>{string}</m:UnresolvedEntry>
+    </m:ResolveNames>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+    POST_BODY = POST_BODY.format(string=QueryString)
+
+    ews_url = "/EWS/Exchange.asmx"
+    if port ==443:
+        try:
+            uv_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            session = HTTPSConnection(host, port, context=uv_context)
+        except AttributeError:
+            session = HTTPSConnection(host, port)
+    else:        
+        session = HTTPConnection(host, port)
+
+    # Use impacket for NTLM
+    ntlm_nego = ntlm.getNTLMSSPType1(host, domain)
+
+    #Negotiate auth
+    negotiate = base64.b64encode(ntlm_nego.getData())
+    # Headers
+    headers = {
+        "Authorization": 'NTLM %s' % negotiate.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("POST", ews_url, POST_BODY, headers)
+    res = session.getresponse()
+    res.read()
+    if res.status != 401:
+        print('Status code returned: %d. Authentication does not seem required for URL'%(res.status))
+        sys.exit(0)
+    try:
+        if 'NTLM' not in res.getheader('WWW-Authenticate'):
+            print('NTLM Auth not offered by URL, offered protocols: %s'%(res.getheader('WWW-Authenticate')))
+            sys.exit(0)
+    except (KeyError, TypeError):
+        print('No authentication requested by the server for url %s'%(ews_url))
+        sys.exit(0)
+
+    # Get negotiate data
+    try:
+        ntlm_challenge_b64 = re.search('NTLM ([a-zA-Z0-9+/]+={0,2})', res.getheader('WWW-Authenticate')).group(1)
+        ntlm_challenge = base64.b64decode(ntlm_challenge_b64)
+    except (IndexError, KeyError, AttributeError):
+        print('No NTLM challenge returned from server')
+        sys.exit(0)
+
+    if mode =='plaintext':
+        password1 = data;
+        nt_hash = ''
+
+    elif mode =='ntlmhash':
+        password1 = ''
+        nt_hash = binascii.unhexlify(data)
+
+    else:
+        print('[!]Wrong parameter')
+        sys.exit(0)
+
+    lm_hash = ''    
+    ntlm_auth, _ = ntlm.getNTLMSSPType3(ntlm_nego, ntlm_challenge, user, password1, domain, lm_hash, nt_hash)
+    auth = base64.b64encode(ntlm_auth.getData())
+
+    headers = {
+        "Authorization": 'NTLM %s' % auth.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("POST", ews_url, POST_BODY, headers)
+    res = session.getresponse()
+    body = res.read()
+
+    if res.status == 401: 
+        print('[!] Server returned HTTP status 401 - authentication failed')          
+        sys.exit(0)
+
+    else:       
+        if res.status == 200: 
+            if 'No results were found.' in bytes.decode(body):
+                return False
+
+            x = bytes.decode(body).find('TotalItemsInView')
+            y = bytes.decode(body).find('IncludesLastItemInRange')
+            if y==-1:
+                return True  
+            size = bytes.decode(body)[x+18:y-2] 
+            if size=='100':
+                print("[!] Search results may be incomplete, need to add search criteria.")
+
+            responsecode_name = re.compile(r"<m:ResponseCode>(.*?)</m:ResponseCode>")
+            responsecode = responsecode_name.findall(bytes.decode(body))
+            pattern_name = re.compile(r"<t:EmailAddress>(.*?)</t:EmailAddress>")
+            name = pattern_name.findall(bytes.decode(body))
+            for i in range(len(name)):  
+                AddressList.append(name[i]) 
+        return True
 
 if __name__ == '__main__':
     if len(sys.argv)!=8:
@@ -767,10 +1081,38 @@ if __name__ == '__main__':
         print('- listhiddenfolderofinbox')
         print('- createtestmail')
         print('- SetHiddenPropertyType')               
-        print('- UpdateHiddenPropertyType')      
+        print('- UpdateHiddenPropertyType')
+        print('- getcontact')
+        print('- findpeople')
+        print('- findallpeople') 
+        print('- resolvename')
+        print('- resolveallname') 
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext test.com user1 password1 getfolderofinbox'%(sys.argv[0]))
         print('%s test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1 listmailofinbox'%(sys.argv[0]))
         sys.exit(0)
     else:
-        ewsManage(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+        if sys.argv[7] == "findallpeople":
+            print('[*]This operation can only be used on Exchange Server 2013 or newer version')
+            for i in range(97,123):
+                ewsManage_findallpeople(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], chr(i))
+            print("[+] GlobalAddressList:")    
+            AddressList = list(set(AddressList))
+            for i in range(len(AddressList)):
+                print("%s"%(AddressList[i]))
+
+        elif sys.argv[7] == "resolveallname": 
+            for i in range(97,123):
+                for j in range(97,123):  
+                    ewsManage_resolveallname(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], chr(i)+chr(j))
+            print("[+] GlobalAddressList:")    
+            AddressList = list(set(AddressList))
+            for i in range(len(AddressList)):
+                print("%s"%(AddressList[i]))        
+
+        else:  
+            ewsManage(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+
+
+
+
