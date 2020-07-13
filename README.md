@@ -210,6 +210,7 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - getfolderofsentitems
 - listmailofinbox
 - listmailofsentitems
+- listmailoffolder
 - getmail
 - deletemail
 - deletefolder
@@ -229,7 +230,13 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - createtestmail
 - SetHiddenPropertyType
 - UpdateHiddenPropertyType
-- listmailoffolder
+- getcontact
+- findpeople
+- findallpeople
+- resolvename
+- resolveallname
+
+
 ```
 
 Eg.
