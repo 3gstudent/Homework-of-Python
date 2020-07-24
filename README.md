@@ -205,7 +205,7 @@ checkAutodiscover.py <host> <port> <mode> <email> <password> <command>
 <command>:
 - checkautodiscover
 - getusersetting
-- checkOAB
+- checkoab
 - downloadlzx
 ```
 
