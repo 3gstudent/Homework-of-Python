@@ -185,8 +185,6 @@ def getUsersetting(host, port, mode, email, data):
     DomainName = input("Input the domain name of the exchange server(not ip):")
     POST_BODY = POST_BODY.format(domain=DomainName, mail=email)
 
-
-
     if port ==443:
         try:
             uv_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
@@ -234,7 +232,6 @@ def getUsersetting(host, port, mode, email, data):
         print('No NTLM challenge returned from server')
         return False
 
-
     if mode =='plaintext':
         password1 = data;
         nt_hash = ''
@@ -274,8 +271,8 @@ def getUsersetting(host, port, mode, email, data):
             file_object.write(bytes.decode(body))
         return True
 
-def checkOAB(host, port, mode, email, data):
 
+def checkoab(host, port, mode, email, data):
     OABID = input("Input the OABID:")
     OAB_url = "/OAB/" + OABID + "/oab.xml"
     tmp = email.split('@')
@@ -369,8 +366,6 @@ def checkOAB(host, port, mode, email, data):
             print('[+] Default Global Address:%s'%(name[0]))
 
         return True
-
-
 
 
 def downloadlzx(host, port, mode, email, data):
@@ -485,7 +480,7 @@ if __name__ == '__main__':
         print('<command>:')
         print('- checkautodiscover')
         print('- getusersetting')
-        print('- checkOAB')
+        print('- checkoab')
         print('- downloadlzx')       
         print('Eg.')
         print('%s 192.168.1.1 443 plaintext user1@test.com password1 checkautodiscover'%(sys.argv[0]))
@@ -496,13 +491,10 @@ if __name__ == '__main__':
             checkAutodiscover(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5])
         elif sys.argv[6] == "getusersetting": 
             getUsersetting(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
-        elif sys.argv[6] == "checkOAB": 
-            checkOAB(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
+        elif sys.argv[6] == "checkoab": 
+            checkoab(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
         elif sys.argv[6] == "downloadlzx": 
             downloadlzx(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
 
         else:
             print('[!]Wrong parameter')
-
-
-            
