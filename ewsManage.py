@@ -166,6 +166,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         Id = input("Input the ItemId of the Message:")
         POST_BODY = POST_BODY.format(id=Id)
 
+
     elif command =='deletefolder':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -446,6 +447,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         EmailAddress = input("Input the EmailAddress of current user:")
         POST_BODY = POST_BODY.format(mail=EmailAddress)
 
+
     elif command =='adddelegateofinbox':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -477,6 +479,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         EmailAddress1 = input("Input the EmailAddress of current user:")
         EmailAddress2 = input("Input the EmailAddress of target user:")
         POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
+
 
     elif command =='updatedelegateofinbox':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -510,6 +513,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         EmailAddress2 = input("Input the EmailAddress of target user:")
         POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
 
+
     elif command =='removedelegateofinbox':          
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -534,6 +538,178 @@ def ewsManage(host, port, mode, domain, user, data,command):
         EmailAddress2 = input("Input the EmailAddress of target user:")
         POST_BODY = POST_BODY.format(mail1=EmailAddress1, mail2=EmailAddress2)
 
+
+#https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-set-folder-permissions-for-another-user-by-using-ews-in-exchange
+    elif command =='getdelegateofsentitems': 
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
+               xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" 
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetFolder>
+      <m:FolderShape>
+        <t:BaseShape>IdOnly</t:BaseShape>
+        <t:AdditionalProperties>
+          <t:FieldURI FieldURI="folder:PermissionSet"/>
+        </t:AdditionalProperties>
+      </m:FolderShape>
+      <m:FolderIds>
+        <t:DistinguishedFolderId Id="sentitems" />
+      </m:FolderIds>
+    </m:GetFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+
+    elif command =='adddelegateofsentitems': 
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
+               xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" 
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateFolder>
+      <m:FolderChanges>
+        <t:FolderChange>
+          <t:FolderId Id="{id}" ChangeKey="{key}" />
+          <t:Updates>
+            <t:SetFolderField>
+              <t:FieldURI FieldURI="folder:PermissionSet" />
+              <t:Folder>
+                <t:PermissionSet>
+                  <t:Permissions>
+
+                    <t:Permission>
+                      <t:UserId>
+                        <t:DistinguishedUser>Default</t:DistinguishedUser>
+                      </t:UserId>
+                      <t:CanCreateItems>false</t:CanCreateItems>
+                      <t:CanCreateSubFolders>false</t:CanCreateSubFolders>
+                      <t:IsFolderOwner>false</t:IsFolderOwner>
+                      <t:IsFolderVisible>false</t:IsFolderVisible>
+                      <t:IsFolderContact>false</t:IsFolderContact>
+                      <t:EditItems>None</t:EditItems>
+                      <t:DeleteItems>None</t:DeleteItems>
+                      <t:ReadItems>None</t:ReadItems>
+                      <t:PermissionLevel>None</t:PermissionLevel>
+                    </t:Permission>
+
+                    <t:Permission>
+                    <t:UserId>
+                      <t:DistinguishedUser>Anonymous</t:DistinguishedUser>
+                    </t:UserId>
+                    <t:CanCreateItems>false</t:CanCreateItems>
+                    <t:CanCreateSubFolders>false</t:CanCreateSubFolders>
+                    <t:IsFolderOwner>false</t:IsFolderOwner>
+                    <t:IsFolderVisible>false</t:IsFolderVisible>
+                    <t:IsFolderContact>false</t:IsFolderContact>
+                    <t:EditItems>None</t:EditItems>
+                    <t:DeleteItems>None</t:DeleteItems>
+                    <t:ReadItems>None</t:ReadItems>
+                    <t:PermissionLevel>None</t:PermissionLevel>
+                    </t:Permission>
+
+                    <t:Permission>
+                      <t:UserId>
+                        <t:PrimarySmtpAddress>{mail}</t:PrimarySmtpAddress>
+                      </t:UserId>
+                      <t:PermissionLevel>Editor</t:PermissionLevel>
+                    </t:Permission>
+
+                  </t:Permissions>
+                </t:PermissionSet>
+              </t:Folder>
+            </t:SetFolderField>
+          </t:Updates>
+        </t:FolderChange>
+      </m:FolderChanges>
+    </m:UpdateFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+        Id = input("Input the Id of Sentitems:")
+        Key = input("Input the ChangeKey of Sentitems:")
+        EmailAddress = input("Input the EmailAddress of target user:")
+        POST_BODY = POST_BODY.format(id=Id, key=Key, mail=EmailAddress)
+
+
+    elif command =='restoredelegateofsentitems': 
+        POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
+               xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" 
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2013_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:UpdateFolder>
+      <m:FolderChanges>
+        <t:FolderChange>
+          <t:FolderId Id="{id}" ChangeKey="{key}" />
+          <t:Updates>
+            <t:SetFolderField>
+              <t:FieldURI FieldURI="folder:PermissionSet" />
+              <t:Folder>
+                <t:PermissionSet>
+                  <t:Permissions>
+
+                    <t:Permission>
+                      <t:UserId>
+                        <t:DistinguishedUser>Default</t:DistinguishedUser>
+                      </t:UserId>
+                      <t:CanCreateItems>false</t:CanCreateItems>
+                      <t:CanCreateSubFolders>false</t:CanCreateSubFolders>
+                      <t:IsFolderOwner>false</t:IsFolderOwner>
+                      <t:IsFolderVisible>false</t:IsFolderVisible>
+                      <t:IsFolderContact>false</t:IsFolderContact>
+                      <t:EditItems>None</t:EditItems>
+                      <t:DeleteItems>None</t:DeleteItems>
+                      <t:ReadItems>None</t:ReadItems>
+                      <t:PermissionLevel>None</t:PermissionLevel>
+                    </t:Permission>
+
+                    <t:Permission>
+                    <t:UserId>
+                      <t:DistinguishedUser>Anonymous</t:DistinguishedUser>
+                    </t:UserId>
+                    <t:CanCreateItems>false</t:CanCreateItems>
+                    <t:CanCreateSubFolders>false</t:CanCreateSubFolders>
+                    <t:IsFolderOwner>false</t:IsFolderOwner>
+                    <t:IsFolderVisible>false</t:IsFolderVisible>
+                    <t:IsFolderContact>false</t:IsFolderContact>
+                    <t:EditItems>None</t:EditItems>
+                    <t:DeleteItems>None</t:DeleteItems>
+                    <t:ReadItems>None</t:ReadItems>
+                    <t:PermissionLevel>None</t:PermissionLevel>
+                    </t:Permission>
+
+                  </t:Permissions>
+                </t:PermissionSet>
+              </t:Folder>
+            </t:SetFolderField>
+          </t:Updates>
+        </t:FolderChange>
+      </m:FolderChanges>
+    </m:UpdateFolder>
+  </soap:Body>
+</soap:Envelope>
+'''
+
+        Id = input("Input the Id of Sentitems:")
+        Key = input("Input the ChangeKey of Sentitems:")
+        POST_BODY = POST_BODY.format(id=Id, key=Key)
+
+
     elif command =='getinboxrules':         
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -549,6 +725,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         EmailAddress1 = input("Input the EmailAddress of current user:")
         POST_BODY = POST_BODY.format(mail1=EmailAddress1)
+
 
     elif command =='updateinboxrules':         
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -584,6 +761,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         EmailAddress1 = input("Input the EmailAddress you want to forward to:")
         POST_BODY = POST_BODY.format(mail1=EmailAddress1)
 
+
     elif command =='removeinboxrules':  
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -605,6 +783,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         RuleId = input("Input the rule ID:")
         POST_BODY = POST_BODY.format(id=RuleId)
 
+
     elif command =='getcontact':    
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -621,6 +800,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Body>
 </soap:Envelope>
 '''
+
 
     elif command =='findpeople':   
         print('[*]This operation can only be used on Exchange Server 2013 or newer version') 
@@ -642,6 +822,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
         QueryString = input("Input the QueryString:")
         POST_BODY = POST_BODY.format(string=QueryString)
+
 
     elif command =='resolvename':
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
@@ -1072,6 +1253,9 @@ if __name__ == '__main__':
         print('- adddelegateofinbox')
         print('- updatedelegateofinbox')
         print('- removedelegateofinbox')
+        print('- getdelegateofsentitems')
+        print('- updatedelegateofsentitems')
+        print('- restoredelegateofsentitems')       
         print('- getinboxrules')
         print('- updateinboxrules')
         print('- removeinboxrules')
@@ -1112,7 +1296,3 @@ if __name__ == '__main__':
 
         else:  
             ewsManage(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
-
-
-
-
