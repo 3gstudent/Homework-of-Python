@@ -245,6 +245,9 @@ ewsManage.py <host> <port> <mode> <domain> <user> <password> <command>
 - adddelegateofinbox
 - updatedelegateofinbox
 - removedelegateofinbox
+- getdelegateofsentitems
+- updatedelegateofsentitems
+- restoredelegateofsentitems
 - getinboxrules
 - updateinboxrules
 - removeinboxrules
