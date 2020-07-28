@@ -194,7 +194,7 @@ checkEWS.py 192.168.1.1 443 plaintext test.com user1 password1
 checkEWS.py test.com 80 ntlmhash test.com user1 c5a237b7e9d8e708d8436b6148a25fa1
 ```
 
-### checkAutodiscover
+### checkAutodiscover.py
 
 Use to access Autodiscover.xml and get the user's configuration(Support plaintext and ntlmhash)
 
@@ -218,7 +218,12 @@ checkAutodiscover.py test.com 80 ntlmhash user1@test.com c5a237b7e9d8e708d8436b6
 148a25fa1 getusersetting
 ```
 
+### checkAutodiscoverEx.py
 
+Extra mode of checkAutodiscover.py
+
+Add a <domain> parameter
+      
 ### ewsManage.py   
   
 Use to access Exchange Web Service(Support plaintext and ntlmhash)
