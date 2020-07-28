@@ -74,7 +74,7 @@ def checkAutodiscover(host, port, mode, email, data):
         nt_hash = binascii.unhexlify(data)
 
     else:
-        print('[!]Wrong parameter')
+        print('[!] Wrong parameter')
         return False
 
     lm_hash = ''    
@@ -118,21 +118,21 @@ def checkAutodiscover(host, port, mode, email, data):
 
             pattern_name = re.compile(r"<LegacyDN>(.*?)</LegacyDN>")
             name = pattern_name.findall(filedata)
-            print('[+] LegacyDN：%s'%(name[0]))
+            print('[+] LegacyDN:%s'%(name[0]))
 
             pattern_name = re.compile(r"<OABUrl>(.*?)</OABUrl>")
             name = pattern_name.findall(filedata)
-            print('[+] OABUrl：%s'%(name[0]))
+            print('[+] OABUrl:%s'%(name[0]))
 
             if 'InternalUrl' in filedata:
                 pattern_name = re.compile(r"<InternalUrl>(.*?)</InternalUrl>")
                 name = pattern_name.findall(filedata)
-                print('[+] InternalUrl：%s'%(name[0]))
+                print('[+] InternalUrl:%s'%(name[0]))
 
             if '<AD>' in filedata:
                 pattern_name = re.compile(r"<AD>(.*?)</AD>")
                 name = pattern_name.findall(filedata)
-                print('[+] AD：%s'%(name[0]))
+                print('[+] AD:%s'%(name[0]))
 
         filename = "checkAutodiscover.xml"    
         print('[+] Save response file to %s'%(filename))
@@ -241,7 +241,7 @@ def getUsersetting(host, port, mode, email, data):
         nt_hash = binascii.unhexlify(data)
 
     else:
-        print('[!]Wrong parameter')
+        print('[!] Wrong parameter')
         return False
 
     lm_hash = ''    
@@ -333,7 +333,7 @@ def checkoab(host, port, mode, email, data):
         nt_hash = binascii.unhexlify(data)
 
     else:
-        print('[!]Wrong parameter')
+        print('[!] Wrong parameter')
         return False
 
     lm_hash = ''    
@@ -432,7 +432,7 @@ def downloadlzx(host, port, mode, email, data):
         nt_hash = binascii.unhexlify(data)
 
     else:
-        print('[!]Wrong parameter')
+        print('[!] Wrong parameter')
         return False
 
     lm_hash = ''    
@@ -497,4 +497,4 @@ if __name__ == '__main__':
             downloadlzx(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]) 
 
         else:
-            print('[!]Wrong parameter')
+            print('[!] Wrong parameter')
