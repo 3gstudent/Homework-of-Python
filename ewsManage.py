@@ -540,7 +540,8 @@ def ewsManage(host, port, mode, domain, user, data,command):
 
 
 #https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-set-folder-permissions-for-another-user-by-using-ews-in-exchange
-    elif command =='getdelegateofsentitems': 
+#Doesn't support sentitems
+    elif command =='getdelegateofinbox2': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
@@ -558,7 +559,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
         </t:AdditionalProperties>
       </m:FolderShape>
       <m:FolderIds>
-        <t:DistinguishedFolderId Id="sentitems" />
+        <t:DistinguishedFolderId Id="inbox" />
       </m:FolderIds>
     </m:GetFolder>
   </soap:Body>
@@ -566,7 +567,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
 '''
 
 
-    elif command =='adddelegateofsentitems': 
+    elif command =='adddelegateofinbox2': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
@@ -586,7 +587,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
               <t:Folder>
                 <t:PermissionSet>
                   <t:Permissions>
-
                     <t:Permission>
                       <t:UserId>
                         <t:DistinguishedUser>Default</t:DistinguishedUser>
@@ -601,7 +601,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
                       <t:ReadItems>None</t:ReadItems>
                       <t:PermissionLevel>None</t:PermissionLevel>
                     </t:Permission>
-
                     <t:Permission>
                     <t:UserId>
                       <t:DistinguishedUser>Anonymous</t:DistinguishedUser>
@@ -616,14 +615,12 @@ def ewsManage(host, port, mode, domain, user, data,command):
                     <t:ReadItems>None</t:ReadItems>
                     <t:PermissionLevel>None</t:PermissionLevel>
                     </t:Permission>
-
                     <t:Permission>
                       <t:UserId>
                         <t:PrimarySmtpAddress>{mail}</t:PrimarySmtpAddress>
                       </t:UserId>
                       <t:PermissionLevel>Editor</t:PermissionLevel>
                     </t:Permission>
-
                   </t:Permissions>
                 </t:PermissionSet>
               </t:Folder>
@@ -636,13 +633,13 @@ def ewsManage(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
-        Id = input("Input the Id of Sentitems:")
-        Key = input("Input the ChangeKey of Sentitems:")
+        Id = input("Input the Id of Inbox:")
+        Key = input("Input the ChangeKey of Inbox:")
         EmailAddress = input("Input the EmailAddress of target user:")
         POST_BODY = POST_BODY.format(id=Id, key=Key, mail=EmailAddress)
 
 
-    elif command =='restoredelegateofsentitems': 
+    elif command =='restoredelegateofinbox2': 
         POST_BODY = '''<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
@@ -662,7 +659,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
               <t:Folder>
                 <t:PermissionSet>
                   <t:Permissions>
-
                     <t:Permission>
                       <t:UserId>
                         <t:DistinguishedUser>Default</t:DistinguishedUser>
@@ -677,7 +673,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
                       <t:ReadItems>None</t:ReadItems>
                       <t:PermissionLevel>None</t:PermissionLevel>
                     </t:Permission>
-
                     <t:Permission>
                     <t:UserId>
                       <t:DistinguishedUser>Anonymous</t:DistinguishedUser>
@@ -692,7 +687,6 @@ def ewsManage(host, port, mode, domain, user, data,command):
                     <t:ReadItems>None</t:ReadItems>
                     <t:PermissionLevel>None</t:PermissionLevel>
                     </t:Permission>
-
                   </t:Permissions>
                 </t:PermissionSet>
               </t:Folder>
@@ -705,8 +699,8 @@ def ewsManage(host, port, mode, domain, user, data,command):
 </soap:Envelope>
 '''
 
-        Id = input("Input the Id of Sentitems:")
-        Key = input("Input the ChangeKey of Sentitems:")
+        Id = input("Input the Id of Inbox:")
+        Key = input("Input the ChangeKey of Inbox:")
         POST_BODY = POST_BODY.format(id=Id, key=Key)
 
 
@@ -1253,9 +1247,9 @@ if __name__ == '__main__':
         print('- adddelegateofinbox')
         print('- updatedelegateofinbox')
         print('- removedelegateofinbox')
-        print('- getdelegateofsentitems')
-        print('- updatedelegateofsentitems')
-        print('- restoredelegateofsentitems')       
+        print('- getdelegateofinbox2')
+        print('- updatedelegateofinbox2')
+        print('- restoredelegateofinbox2')       
         print('- getinboxrules')
         print('- updateinboxrules')
         print('- removeinboxrules')
