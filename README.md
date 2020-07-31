@@ -340,6 +340,32 @@ Eg.
 easCheck.py 192.168.1.1 user1 password1
 ```
 
+---
 
+### checkOWA.py
+
+Use to check the valid account of Exchange by connecting to OWA.
+
+Usage:
+
+```
+checkOWA.py <url> <user> <password>
+```
+
+### owaManage.py
+
+Use to read mails by connecting to OWA.
+
+Usage:
+
+```
+owaManage.py  <url> <user> <password> <command>
+<command>
+- ListFolder
+- ViewMail
+- DownloadAttachment
+```
+
+---
 
 
