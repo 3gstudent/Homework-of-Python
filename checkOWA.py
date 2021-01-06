@@ -31,5 +31,5 @@ if __name__ == '__main__':
         print('%s 192.168.1.1 user1 password1'%(sys.argv[0]))
         sys.exit(0)
     else:
-        CheckOWA("192.168.1.1", "test1", "1qaz@WSX3edc")
+        CheckOWA(sys.argv[1], sys.argv[2], sys.argv[3])
 
