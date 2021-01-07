@@ -786,7 +786,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Header>
   <soap:Body>
       <m:FindPeople>
-         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="100" Offset="0"/>
          <m:ParentFolderId>
             <t:DistinguishedFolderId Id="contacts"/>
          </m:ParentFolderId>
@@ -805,7 +805,7 @@ def ewsManage(host, port, mode, domain, user, data,command):
   </soap:Header>
   <soap:Body>
       <m:FindPeople>
-         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="100" Offset="0"/>
          <m:ParentFolderId>
             <t:DistinguishedFolderId Id="directory"/>
          </m:ParentFolderId>
@@ -1003,7 +1003,7 @@ def ewsManage_findallpeople(host, port, mode, domain, user, data,QueryString):
   </soap:Header>
   <soap:Body>
       <m:FindPeople>
-         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="999999" Offset="0"/>
+         <m:IndexedPageItemView BasePoint="Beginning" MaxEntriesReturned="100" Offset="0"/>
          <m:ParentFolderId>
             <t:DistinguishedFolderId Id="directory"/>
          </m:ParentFolderId>
