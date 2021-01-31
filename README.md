@@ -386,7 +386,27 @@ Eg:
 imapManage.py 192.168.1.1 user1 password CheckConfig
 ```
 
+---
+
+### aspxCmdNTLM.py 
 
 
+Use to implement NTLM authentication and communicate with [execCmd.aspx](https://github.com/3gstudent/test/blob/master/execCmd.aspx)
 
+Communication data is encoded with Base64
 
+Usage:
+
+```
+aspxCmdNTLM.py <host> <port> <url> <mode> <domain> <user> <password> <command>
+<mode>:
+- plaintext
+- ntlmhash
+Eg.
+aspxCmdNTLM.py 192.168.1.1 443 https://192.168.1.1/1.txt plaintext test.com user
+1 password1 whoami
+aspxCmdNTLM.py test.com 80 http://192.168.1.1/1.aspx ntlmhash test.com user1 c5a
+237b7e9d8e708d8436b6148a25fa1 whoami
+```
+
+---
