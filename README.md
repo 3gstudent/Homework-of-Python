@@ -375,9 +375,8 @@ Use IMAP to connect to the mail server.
 Usage:
 
 ```
-      imapManage.py <IMAP server> <username> <password> <command>
-      
-command:
+imapManage.py <IMAP server> <username> <password> <command>    
+<command>:
 CheckConfig             get the folder name
 SaveAttachOfInbox       save the attachments of Inbox
 SaveAttachOfSent        save the attachments of Sent
