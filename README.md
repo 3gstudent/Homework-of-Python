@@ -368,4 +368,26 @@ owaManage.py  <url> <user> <password> <command>
 
 ---
 
+### imapManage.py
+
+Use IMAP to connect to the mail server.
+
+Usage:
+
+```
+      imapManage.py <IMAP server> <username> <password> <command>
+      
+command:
+CheckConfig             get the folder name
+SaveAttachOfInbox       save the attachments of Inbox
+SaveAttachOfSent        save the attachments of Sent
+DownloadAllMailOfInbox  download all the mails of Inbox
+DownloadAllMailOfSent   download all the mails of Sent
+Eg:
+imapManage.py 192.168.1.1 user1 password CheckConfig
+```
+
+
+
+
 
