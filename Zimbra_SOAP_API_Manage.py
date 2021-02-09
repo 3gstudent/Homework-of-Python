@@ -641,9 +641,8 @@ def upload_request(uri,token):
     headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
 
     m = MultipartEncoder(fields={
-    'filename1':(None,"test",None),
-    'clientFile':(filename,fileContent,"image/jpeg"),
-    'requestId':(None,"12345",None),
+    'filename':(None,"test",None),
+    'clientFile':(filename,fileContent,"image/jpeg")
     }, boundary = '----WebKitFormBoundary1abcdefghijklmno')
 
     r = requests.post(uri+"/service/extension/clientUploader/upload",data=m,headers=headers,verify=False)
