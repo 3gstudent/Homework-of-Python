@@ -413,6 +413,8 @@ aspxCmdNTLM.py test.com 80 http://192.168.1.1/1.aspx ntlmhash test.com user1 c5a
 
 ### SharpExchangeBackdoor.py
 
+C sharp Version: [SharpExchangeBackdoor.cs](https://github.com/3gstudent/Homework-of-C-Sharp/blob/master/SharpExchangeBackdoor.cs)
+
 Use to send payload to the Exchange webshell backdoor.
 
 Support:
