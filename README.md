@@ -140,8 +140,10 @@ Use Zimbra SOAP API to connect the Zimbra mail server.
 
 Usage:
 
+```
       Zimbra_SOAP_API.py <url> <username> <password> <mode>
-      
+```
+
 mode:
 
 - low       auth for low token
@@ -150,25 +152,9 @@ mode:
       
 Eg:
 
+```
       Zimbra_SOAP_API.py https://192.168.1.1 user1@mail.zimbra password low
-  
-Support command of low token:
-
-- GetAllAddressLists
-- GetContacts
-- GetFolder
-- GetItem <path>,Eg:GetItem /Inbox
-- GetMsg <MessageID>,Eg:GetMsg 259  
-  
-Support command of admin token: 
-
-- GetAllDomains
-- GetAllMailboxes
-- GetAllAccounts
-- GetAllAdminAccounts
-- GetMemcachedClientConfig
-- GetLDAPEntries <query> <ldapSearchBase>,Eg:GetLDAPEntries cn=* dc=zimbra,dc=com
-- getalluserhash <ldapSearchBase>,Eg:getalluserhash dc=zimbra,dc=com
+```
 
 ---
 
