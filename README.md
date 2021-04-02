@@ -473,7 +473,6 @@ Usage:
 
 ```
     <url> <key> <path>
-<path>: owa or ecp
 ```
 
 eg.    
@@ -496,7 +495,6 @@ Usage:
 
 ```
     <url> <key> <path>
-<path>: owa or ecp
 ```
 
 eg.    
