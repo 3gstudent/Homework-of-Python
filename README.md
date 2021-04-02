@@ -467,7 +467,7 @@ You can generate payload.obj like this:
 Use to test the deserializing code execution of Exchange.            
 From read and write permissions of Exchange files to deserializing code execution.
 You should modify the machineKey in %ExchangeInstallPath%\\FrontEnd\\HttpProxy\\<path>\\web.config to implement deserializing code execution.
-<path>:owa or ecp
+`<path>`:owa or ecp
             
 Usage:
 
@@ -488,7 +488,7 @@ ExchangeDeserializeShell-NoAuth-TextFormattingRunProperties.py mail.test.com CB2
 Use to test the deserializing code execution of Exchange.            
 From read and write permissions of Exchange files to deserializing code execution.
 You should modify the machineKey in %ExchangeInstallPath%\\FrontEnd\\HttpProxy\\<path>\\web.config to implement deserializing code execution.
-<path>:owa or ecp
+`<path>`:owa or ecp
       
 Note:The version of ysoserial.net should be greater than 1.32
 
