@@ -464,6 +464,10 @@ You can generate payload.obj like this:
 
 ### ExchangeDeserializeShell-NoAuth-TextFormattingRunProperties.py
 
+### ExchangeDeserializeShell-NoAuth-ActivitySurrogateSelectorFromFile.py
+
+### ExchangeDeserializeShell-NoAuth-ghostfile.py
+
 Use to test the deserializing code execution of Exchange.            
 From read and write permissions of Exchange files to deserializing code execution.
 You should modify the machineKey in %ExchangeInstallPath%\\FrontEnd\\HttpProxy\\<path>\\web.config to implement deserializing code execution.
@@ -478,32 +482,8 @@ Usage:
 eg.    
 
 ```
-ExchangeDeserializeShell-NoAuth-TextFormattingRunProperties.py 192.168.1.1 CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF owa
-ExchangeDeserializeShell-NoAuth-TextFormattingRunProperties.py mail.test.com CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF ecp    
+ 192.168.1.1 CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF owa
+ mail.test.com CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF ecp    
 ```
-
-### ExchangeDeserializeShell-NoAuth-ActivitySurrogateSelectorFromFile.py
-
-Use to test the deserializing code execution of Exchange.            
-From read and write permissions of Exchange files to deserializing code execution.
-You should modify the machineKey in %ExchangeInstallPath%\\FrontEnd\\HttpProxy\\<path>\\web.config to implement deserializing code execution.
-`<path>`:owa or ecp
-      
-Note:The version of ysoserial.net should be greater than 1.32
-
-Usage:
-
-```
-    <url> <key> <path>
-```
-
-eg.    
-
-```
-ExchangeDeserializeShell-NoAuth-ActivitySurrogateSelectorFromFile.py 192.168.1.1 CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF owa
-ExchangeDeserializeShell-NoAuth-ActivitySurrogateSelectorFromFile.py mail.test.com CB2721ABDAF8E9DC516D621D8B8BF13A2C9E8689A25303BF ecp    
-```
-
-
 
 ----
