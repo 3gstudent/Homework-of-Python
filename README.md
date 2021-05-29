@@ -493,3 +493,25 @@ eg.
 Use to parse Exchange SOAP XML message.
 
 --- 
+
+### eacManage.py
+          
+Use to access Exchange admin center
+          
+Usage:
+
+```          
+eacManage.py <url> <user> <password> <command>
+<command>:
+- ListAdminRoles
+- NewAdminRoles
+- EditAdminRoles
+- DeleteAdminRoles
+- AddMailbox
+- RemoveMailbox
+- ExportAllMailbox          
+          
+```        
+          
+---          
+          
