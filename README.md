@@ -510,6 +510,8 @@ eacManage.py <url> <user> <password> <command>
 - AddMailbox
 - RemoveMailbox
 - ExportAllMailbox          
+- GetCertificate 
+- ExportCertificate          
           
 ```        
           
