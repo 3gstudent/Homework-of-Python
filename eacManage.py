@@ -15,7 +15,7 @@ def LoginOWA(url, username, password):
     } 
     payload = 'destination=https://%s/owa&flags=4&forcedownlevel=0&username=%s&password=%s&passwordText=&isUtf8=1'%(url, username, password)            
 
-    response = session.post(url1, headers=headers, data=payload, verify = False)
+    response = session.post(url1, headers=headers, data=payload, verify=False)
 
     if 'X-OWA-CANARY' in response.cookies:
         print("[+] Login success")     
@@ -31,7 +31,7 @@ def LoginOWA(url, username, password):
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
             "Content-Type": "application/x-www-form-urlencoded"
             }
-            response = session.post(url1, headers=headers, data=payload, verify = False)            
+            response = session.post(url1, headers=headers, data=payload, verify=False)            
             if response.status_code == 200:
                 print("[+] Login success")
             else:
@@ -42,7 +42,7 @@ def LoginOWA(url, username, password):
             exit(0)
 
     url2 = "https://" + url + "/ecp/"
-    response = session.get(url2, headers=headers, verify = False)  
+    response = session.get(url2, headers=headers, verify=False)  
     msExchEcpCanary = response.cookies['msExchEcpCanary']
     print("    msExchEcpCanary:" + msExchEcpCanary)
     return session,msExchEcpCanary
@@ -60,7 +60,7 @@ def ListAdminRoles(url, session, msExchEcpCanary):
     d = {"filter":{"SearchText":""},"sort":{"Direction":0,"PropertyName":"Name"}}
 
     url3 = "https://" + url + "/ecp/UsersGroups/AdminRoleGroups.svc/GetList"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     dic = response.json()['d']['Output']
     for i in dic:
         print(" -  " + i['Identity']['DisplayName'] + ":" + i['Identity']['RawIdentity'])
@@ -78,7 +78,7 @@ def NewAdminRoles(url, session, msExchEcpCanary):
     d = {"filter":{},"sort":{"Direction":0,"PropertyName":"DisplayName"}}
 
     url3 = "https://" + url + "/ecp/UsersGroups/ManagementRoles.svc/GetList"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     dic = response.json()['d']['Output']   
     for i in dic:
         print(" -  " + i['Identity']['DisplayName'] + ":" + i['Identity']['RawIdentity'])
@@ -119,7 +119,7 @@ def NewAdminRoles(url, session, msExchEcpCanary):
 		}
 
     url3 = "https://" + url + "/ecp/UsersGroups/AdminRoleGroups.svc/NewObject"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     if newName in response.text:
     	print("[+] Add Success")
     	dic = response.json()['d']['Output']
@@ -151,7 +151,7 @@ def EditAdminRoles(url, session, msExchEcpCanary):
 			"sort":{}
 		}
     url3 = "https://" + url + "/ecp/DDI/DDIService.svc/GetList"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     addUserRawIdentity = ''
     if addUser in response.text:
     	print("[+] Result:")
@@ -207,7 +207,7 @@ def EditAdminRoles(url, session, msExchEcpCanary):
 			}
 		}
     url4 = "https://" + url + "/ecp/UsersGroups/AdminRoleGroups.svc/SetObject"
-    response = session.post(url4, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url4, headers=headers, params=p, json=d, verify=False)
     if "Update-RoleGroupMember" in response.text:
         print("[+] Edit Success")
     else:
@@ -240,7 +240,7 @@ def RemoveAdminRoles(url, session, msExchEcpCanary):
         }
 
     url3 = "https://" + url + "/ecp/UsersGroups/AdminRoleGroups.svc/RemoveObjects"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
 
     if len(response.json()['d']['ErrorRecords']) > 0:
         print(response.text)
@@ -281,7 +281,7 @@ def AddMailbox(url, session, msExchEcpCanary):
 }
  
     url3 = "https://" + url + "/ecp/DDI/DDIService.svc/NewObject" 
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     if len(response.json()['d']['ErrorRecords']) > 0:
         print(response.text)
     else:
@@ -316,7 +316,7 @@ def RemoveMailbox(url, session, msExchEcpCanary):
             "sort":{}
         }
     url3 = "https://" + url + "/ecp/DDI/DDIService.svc/GetList"
-    response = session.post(url3, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
     removeUserRawIdentity = ''
     if removeUser in response.text:
         print("[+] Result:")
@@ -359,7 +359,7 @@ def RemoveMailbox(url, session, msExchEcpCanary):
         }
  
     url4 = "https://" + url + "/ecp/DDI/DDIService.svc/MultiObjectExecute" 
-    response = session.post(url4, headers=headers, params=p, json=d, verify = False)
+    response = session.post(url4, headers=headers, params=p, json=d, verify=False)
     print(response.text)
     if len(response.json()['d']['ErrorRecords']) > 0:
         print(response.text)
@@ -387,7 +387,7 @@ def ExportAllMailbox(url, session, msExchEcpCanary):
     }
     postData = urllib.parse.urlencode(body).encode("utf-8")
     url3 = "https://" + url + "/ecp/UsersGroups/Download.aspx" 
-    response = session.post(url3, headers=headers, params=p, data=postData, verify = False)
+    response = session.post(url3, headers=headers, params=p, data=postData, verify=False)
     if response.status_code == 200:
         filename = url + "-ExportAllMailbox.csv"
         print("[*] Saving as " + filename)
@@ -396,6 +396,89 @@ def ExportAllMailbox(url, session, msExchEcpCanary):
     else:
         print(response.status_code)
         print(response.text)
+
+
+def GetCertificate(url, session, msExchEcpCanary):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36xxxxx",
+    }
+
+    print("[*] Try to get the certificate") 
+    p = {
+        "schema": "CertificateServices",
+        "msExchEcpCanary": msExchEcpCanary
+    }
+    d = {
+            "filter":
+            {
+                "Parameters":
+                {
+                    "__type":
+                        "JsonDictionaryOfanyType:#Microsoft.Exchange.Management.ControlPanel",
+                        "SelectedView":"*"
+                }
+            },
+            "sort":{}
+        }
+
+    url3 = "https://" + url + "/ecp/DDI/DDIService.svc/GetList" 
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
+
+    if len(response.json()['d']['ErrorRecords']) > 0:
+        print(response.status_code)
+        print(response.text)
+    else:
+        dic = response.json()['d']['Output']
+        for i in dic:
+            print(" -  Name:" + i['Name'])
+            print("    NotAfter:" + i['NotAfter'])
+            print("    Status:" + i['Status'])
+            print("    Thumbprint:" + i['Thumbprint'])
+
+
+def ExportCertificate(url, session, msExchEcpCanary):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36xxxxx",
+    }
+
+    print("[*] Try to export the certificate") 
+    Thumbprint = input("input the thumbprint of the certificate:")
+    print("[*] Use the default config")
+    pfxPassword = "P@ssw0rd1"
+    savePath = "C:\\Program Files\\Microsoft\\Exchange Server\\V15\\ClientAccess\\ecp\\exportExchange.pfx"
+    print("    pfxPassword:" + pfxPassword)
+    print("    savePath:" + savePath)
+    p = {
+        "schema": "ExportCertificate",
+        "msExchEcpCanary": msExchEcpCanary
+    }
+    d = {
+            "identity":
+            {
+                "__type":"Identity:ECP",
+                "DisplayName":"",
+                "RawIdentity":Thumbprint
+            },
+            "properties":
+            {
+                "Parameters":
+                {
+                    "__type":
+                        "JsonDictionaryOfanyType:#Microsoft.Exchange.Management.ControlPanel",
+                        "PlainPassword":pfxPassword,
+                        "FileName":savePath
+                }
+            }
+        }
+
+    url3 = "https://" + url + "/ecp/DDI/DDIService.svc/SetObject" 
+    response = session.post(url3, headers=headers, params=p, json=d, verify=False)
+
+    if len(response.json()['d']['ErrorRecords']) > 0:
+        print(response.status_code)
+        print(response.text)
+    else:
+        print("[+] Export Success")
 
 
 if __name__ == '__main__':
@@ -412,7 +495,10 @@ if __name__ == '__main__':
         print('- RemoveAdminRoles')
         print('- AddMailbox')
         print('- RemoveMailbox')
-        print('- ExportAllMailbox')               
+        print('- ExportAllMailbox')
+        print('- GetCertificate')
+        print('- ExportCertificate')
+
         print('Eg.')
         print('%s 192.168.1.1 user1 password1 ListAdminRoles'%(sys.argv[0]))
         sys.exit(0)
@@ -452,6 +538,15 @@ if __name__ == '__main__':
             print("[*] ExportAllMailbox")
             ExportAllMailbox(sys.argv[1], session, msExchEcpCanary)
 
+        elif sys.argv[4] == "GetCertificate": 
+            session,msExchEcpCanary = LoginOWA(sys.argv[1], sys.argv[2], sys.argv[3])
+            print("[*] GetCertificate")
+            GetCertificate(sys.argv[1], session, msExchEcpCanary)
+
+        elif sys.argv[4] == "ExportCertificate": 
+            session,msExchEcpCanary = LoginOWA(sys.argv[1], sys.argv[2], sys.argv[3])
+            print("[*] ExportCertificate")
+            ExportCertificate(sys.argv[1], session, msExchEcpCanary)
 
         else:
             print("[!] Wrong parameter")            
