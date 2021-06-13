@@ -516,4 +516,21 @@ eacManage.py <url> <user> <password> <command>
 ```        
           
 ---          
+         
+### vSphereAutomationAPI_Manage.py
+          
+Use vSphere Automation API(v7.0U1+) to manage the VM
+          
+Support Windows and Linux VM          
+          
+### vSphereWebServicesAPI_Manage.py
+          
+Use vSphere Web Services API to manage the VM
+          
+Reference: https://github.com/vmware/pyvmomi/
+          
+Install: pip install --upgrade pyvmomi          
+   
+---
+          
           
