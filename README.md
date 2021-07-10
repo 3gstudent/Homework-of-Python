@@ -532,5 +532,14 @@ Reference: https://github.com/vmware/pyvmomi/
 Install: pip install --upgrade pyvmomi          
    
 ---
+        
+### SolarWindsOrion_Manage.py    
           
+Use to manage the SolarWinds Orion platform
+          
+### SolarWindsOrionAPI_Manage.py
+          
+Use SolarWinds Orion API to manage the Orion platform          
+                 
+---         
           
