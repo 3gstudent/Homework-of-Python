@@ -513,7 +513,7 @@ def check_version(url):
     else:
         print("[+] vCenter < v7.0U2")
         print("    The old REST APIs are deprecated")
-        print("    You can use vSphereAutomationAPI_Manage.py")       
+        print("    You can use vSphereWebServicesAPI_Manage.py")       
         sys.exit(0)
 
 
