@@ -354,7 +354,7 @@ if __name__ == "__main__":
         print("mode:")
         print("- ListVM")        
         print("- GetVMConfig")
-        print("- List_Host")
+        print("- ListHost")
         print("- ListVMProcess")
         print("- CreateVMProcess")
         print("- KillVMProcess")
