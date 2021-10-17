@@ -531,6 +531,10 @@ Reference: https://github.com/vmware/pyvmomi/
           
 Install: pip install --upgrade pyvmomi          
    
+### vCenterLDAP_Manage.py
+          
+Use to manage the LDAP database on vCenter.          
+          
 ---
         
 ### SolarWindsOrion_Manage.py    
