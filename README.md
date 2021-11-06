@@ -552,4 +552,21 @@ Use SolarWinds Orion API to manage the Orion platform
 Use to manage the MailEnable mail server          
           
 ---          
+  
+### blind_XXEPlatform_CVE-2019-9670.py
+          
+It supports receiving results through HTTP or FTP protocol.          
+          
+---
+          
+### ewsManage_Downloader.py
+          
+Use to access Exchange Web Service(Support plaintext and ntlmhash)
+          
+### ewsManage_exchangelib_Downloader.py
+          
+Use to access Exchange Web Service(Support plaintext and ntlmhash)
+          
+---        
+          
           
