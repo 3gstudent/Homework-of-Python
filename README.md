@@ -566,6 +566,16 @@ Use to access Exchange Web Service(Support plaintext and ntlmhash)
 ### ewsManage_exchangelib_Downloader.py
           
 Use to access Exchange Web Service(Support plaintext and ntlmhash)
+    
+### ewsManage_requests_ntlm_Downloader.py
+          
+Use requests_ntlm2 to access Exchange Web Service(Support plaintext and ntlmhash)
+          
+### ewsManage_requests_ntlm_Session_Downloader.py
+          
+Use requests_ntlm2 to access Exchange Web Service(Support plaintext and ntlmhash)
+          
+Use session to reduce communication data          
           
 ---        
           
