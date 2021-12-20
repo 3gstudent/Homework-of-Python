@@ -579,4 +579,12 @@ Use session to reduce communication data
           
 ---        
           
+### vCenter_ExtraCertFromMdb.py
           
+Modified from https://github.com/horizon3ai/vcenter_saml_login          
+          
+### vCenter_GenerateLoginCookie.py 
+          
+Modified from https://github.com/horizon3ai/vcenter_saml_login  
+          
+---              
