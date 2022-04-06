@@ -587,4 +587,11 @@ Modified from https://github.com/horizon3ai/vcenter_saml_login
           
 Modified from https://github.com/horizon3ai/vcenter_saml_login  
           
----              
+--- 
+          
+### Exchange_GetVersion_MatchVul.py
+          
+Use to get the version of Exchange and match the existing vulnerabilities          
+          
+          
+          
