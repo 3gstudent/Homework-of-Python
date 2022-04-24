@@ -167,7 +167,17 @@ def GetVersion_MatchVul(host):
         } 
         url1 = "https://" + host + "/ews"
         req = requests.get(url1, headers = headers, verify=False)
-        print("[+] X-FEServer:" + req.headers["X-FEServer"])
+        if "X-OWA-Version" not in req.headers:
+            print("[!] Exchange 2010 or older")
+            print("[*] Trying to access OWA")
+            url2 = "https://" + host + "/owa"
+            req = requests.get(url2, headers = headers, verify=False)
+            pattern_version = re.compile(r"/owa/(.*?)/themes/resources/favicon.ico")
+            version = pattern_version.findall(req.text)[0]
+            print("[+] Version:" + version)
+            sys.exit(0)
+        else:
+            print("[+] X-FEServer:" + req.headers["X-FEServer"])
 
         if "X-OWA-Version" in req.headers:
             version = req.headers["X-OWA-Version"]
