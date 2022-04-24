@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if len(sys.argv)!=2:    
         print('Exchange_GetInternalIP.py')       
         print('Use to get the internal IP of Exchange')
-        print('Based on msf auxiliary/scanner/http/owa_iis_internal_ip,but support more Exchange Servers')
+        print('Based on msf auxiliary/scanner/http/owa_iis_internal_ip, but support more Exchange Servers.')
         print('Usage:')
         print('%s <path>'%(sys.argv[0]))
         print('Eg.')
