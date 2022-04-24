@@ -593,5 +593,13 @@ Modified from https://github.com/horizon3ai/vcenter_saml_login
           
 Use to get the version of Exchange and match the existing vulnerabilities          
           
+--- 
+          
+### Exchange_GetInternalIP.py
+          
+Use to get the internal IP of Exchange          
+          
+Based on msf auxiliary/scanner/http/owa_iis_internal_ip, but support more Exchange Servers.
+          
           
           
