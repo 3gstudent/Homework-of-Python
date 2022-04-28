@@ -601,5 +601,11 @@ Use to get the internal IP of Exchange
           
 Based on msf auxiliary/scanner/http/owa_iis_internal_ip, but support more Exchange Servers.
           
+--- 
+          
+### vRealizeOperationsManager_GetVersion.py
+          
+Use to get the version of vRealize Operations Manager
+          
           
           
