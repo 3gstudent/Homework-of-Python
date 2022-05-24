@@ -613,6 +613,19 @@ Use to get the version of vRealize Operations Manager
 Use bash to run command
           
 --- 
+### SophosUTM_plxDecrypter.py
           
+Use to decrypt the .plx file of Sophos UTM
           
+Reference:
+          
+https://www.atredis.com/blog/2021/8/18/sophos-utm-cve-2020-25223   
+   
+https://github.com/the6p4c/bfs_extract
+          
+### SophosUTM_ConfigParser.py
+          
+Use to parse the config of Sophos UTM      
+          
+---       
           
