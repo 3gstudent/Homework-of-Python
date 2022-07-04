@@ -6,6 +6,9 @@ import urllib3
 urllib3.disable_warnings()
 
 versionarray = [
+["Exchange Server 2019 CU12 May22SU", "05/10/2022", "15.2.1118.9"],
+["Exchange Server 2019 CU12 (2022H1)", "04/20/2022", "15.2.1118.7"],
+["Exchange Server 2019 CU11 May22SU", "05/10/2022", "15.2.986.26"],
 ["Exchange Server 2019 CU11 Mar22SU", "03/08/2022", "15.2.986.22"],
 ["Exchange Server 2019 CU11 Jan22SU", "01/11/2022", "15.2.986.15"],
 ["Exchange Server 2019 CU11 Nov21SU", "11/09/2021", "15.2.986.14"],
@@ -42,6 +45,9 @@ versionarray = [
 ["Exchange Server 2019 RTM Mar21SU", "03/02/2021", "15.2.221.18"],
 ["Exchange Server 2019 RTM", "10/22/2018", "15.2.221.12"],
 ["Exchange Server 2019 Preview", "07/24/2018", "15.2.196.0"],
+["Exchange Server 2016 CU23 May22SU", "05/10/2022", "15.1.2507.9"],
+["Exchange Server 2016 CU23 (2022H1)", "04/20/2022", "15.1.2507.6"],
+["Exchange Server 2016 CU22 May22SU", "05/10/2022", "15.1.2375.28"],
 ["Exchange Server 2016 CU22 Mar22SU", "03/08/2022", "15.1.2375.24"],
 ["Exchange Server 2016 CU22 Jan22SU", "01/11/2022", "15.1.2375.18"],
 ["Exchange Server 2016 CU22 Nov21SU", "11/09/2021", "15.1.2375.17"],
@@ -92,6 +98,7 @@ versionarray = [
 ["Exchange Server 2016 CU1", "03/15/2016", "15.1.396.30"],
 ["Exchange Server 2016 RTM", "10/01/2015", "15.1.225.42"],
 ["Exchange Server 2016 Preview", "07/22/2015", "15.1.225.16"],
+["Exchange Server 2013 CU23 May22SU", "05/10/2022", "15.0.1497.36"],
 ["Exchange Server 2013 CU23 Mar22SU", "03/08/2022", "15.0.1497.33"],
 ["Exchange Server 2013 CU23 Jan22SU", "01/11/2022", "15.0.1497.28"],
 ["Exchange Server 2013 CU23 Nov21SU", "11/09/2021", "15.0.1497.26"],
@@ -136,13 +143,20 @@ vularray = [
 ["CVE-2021-34473+CVE-2021-34523+CVE-2021-31207", "04/13/2021"],
 ["CVE-2021-31195+CVE-2021-31196", "05/11/2020"],
 ["CVE-2021-31206", "07/13/2021"],
-["CVE-2021-42321", "11/09/2021"]
+["CVE-2021-42321", "11/09/2021"],
+["CVE-2022-23277", "03/08/2022"],
 ]
 
 def vulscan(date):
     for value in vularray:
-        if (date.split('/')[2] <= value[1].split('/')[2]) & (date.split('/')[1] <= value[1].split('/')[1]) & (date.split('/')[0] < value[1].split('/')[0]):
-            print("    Vul: " + value[0] + ", " + value[1])
+        if (date.split('/')[2] < value[1].split('/')[2]):
+            print("[+] " + value[0] + ", " + value[1])
+        else:
+            if (date.split('/')[2] == value[1].split('/')[2]) & (date.split('/')[0] < value[1].split('/')[0]):
+                print("[+] " + value[0] + ", " + value[1])
+            else:
+                if (date.split('/')[2] == value[1].split('/')[2]) & (date.split('/')[0] == value[1].split('/')[0]) & (date.split('/')[1] < value[1].split('/')[1]):
+                    print("[+] " + value[0] + ", " + value[1])
 
 def matchversion(version):
     for value in versionarray:
@@ -210,7 +224,7 @@ if __name__ == '__main__':
         print('%s 192.168.1.1'%(sys.argv[0]))      
         sys.exit(0)
     else:
-        print("[*] Exchange Server build numbers and release dates: 03/21/2022")
+        print("[*] Exchange Server build numbers and release dates: 06/29/2022")
         print("    https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019")
         GetVersion_MatchVul(sys.argv[1])
 
