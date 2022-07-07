@@ -592,7 +592,17 @@ Modified from https://github.com/horizon3ai/vcenter_saml_login
 ### Exchange_GetVersion_MatchVul.py
           
 Use to get the version of Exchange and match the existing vulnerabilities          
-          
+
+### Exchange_GetVersion_ParseFromFile.py
+
+Use to get the version of Exchange and parse the version from https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019
+
+You should save https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019 as exchange.data
+ 
+### Exchange_GetVersion_ParseFromWebsite.py
+
+Use to get the version of Exchange and parse the version from https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019
+
 --- 
           
 ### Exchange_GetInternalIP.py
