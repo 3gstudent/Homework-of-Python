@@ -188,6 +188,10 @@ def GetVersion_MatchVul(host):
             req = requests.get(url2, headers = headers, verify=False)
             pattern_version = re.compile(r"/owa/(.*?)/themes/resources/favicon.ico")
             version = pattern_version.findall(req.text)[0]
+            if "auth" in version:
+                version = version.split('/')[1]
+                print("[+] Version:" + version)
+                guessversion(version)
             print("[+] Version:" + version)
             sys.exit(0)
         else:
@@ -227,10 +231,4 @@ if __name__ == '__main__':
         print("[*] Exchange Server build numbers and release dates: 06/29/2022")
         print("    https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019")
         GetVersion_MatchVul(sys.argv[1])
-
-
-
-
-
-
 
