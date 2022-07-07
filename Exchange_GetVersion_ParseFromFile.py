@@ -45,6 +45,8 @@ def GetVersion(host):
             req = requests.get(url2, headers = headers, verify=False)
             pattern_version = re.compile(r"/owa/(.*?)/themes/resources/favicon.ico")
             version = pattern_version.findall(req.text)[0]
+            if "auth" in version:
+                version = version.split('/')[1]
             print("[+] Version:" + version)
             return version
         else:
