@@ -11,20 +11,14 @@ headers = {
 }
 
 def FetchInformation():
-    try:
-        file = "exchange.data"
-        print("[*] Try to open " + file)
-        with open(file, 'r') as file_obj:
-            content = file_obj.read()
-        soup = BeautifulSoup(content, features="html.parser")
-        print("[+] Article date: " + soup.find('time').text)  
-        return soup
-    except Exception as e:
-        print("[!] You should save https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019 as exchange.data")
-        sys.exit(0)
+    url = "https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019"
+    response = requests.get(url, verify=False, headers=headers)
+    soup = BeautifulSoup(response.text, features="html.parser")
+    print("[*] Try to access " + url)
+    print("[+] Article date: " + soup.find('time').text)
+    return soup
 
 def ParseVersion(version, soup):
-
     for tag in soup.find_all('tr'):
         if version in tag.text:
             print("[+] Exchange Information")
@@ -46,7 +40,7 @@ def GetVersion(host):
             pattern_version = re.compile(r"/owa/(.*?)/themes/resources/favicon.ico")
             version = pattern_version.findall(req.text)[0]
             if "auth" in version:
-                version = version.split('/')[1]
+                version = version.split('/')[1]            
             print("[+] Version:" + version)
             return version
         else:
@@ -73,17 +67,15 @@ def GetVersion(host):
 
 if __name__ == '__main__':
     if len(sys.argv)!=2:    
-        print('Exchange_GetVersion_ParseFromFile.py')       
+        print('Exchange_GetVersion_ParseFromWebsite.py')       
         print('Use to get the version of Exchange and parse the version from https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019')
-        print('Note:')
-        print('You should save https://docs.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019 as exchange.data')
         print('Usage:')
         print('%s <path>'%(sys.argv[0]))
         print('Eg.')
         print('%s 192.168.1.1'%(sys.argv[0]))      
         sys.exit(0)
     else:
+        version = GetVersion(sys.argv[1])
         soup = FetchInformation()
-        version = GetVersion(sys.argv[1])    
         ParseVersion(version, soup)
 
