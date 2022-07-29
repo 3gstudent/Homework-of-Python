@@ -1517,6 +1517,49 @@ def uploadzimlet_request(uri,token):
         print("[!]")
         print(r.text)
 
+def addshare_request(uri,token):
+    print("[*] Input the target mailbox:")
+    mailbox = input("[>]: ")
+    print("[*] Input the share folder:")
+    print("    2     Inbox")
+    print("    4     Junk")
+    print("    5     Sent")
+    print("    6     Drafts")
+
+    folder = input("[>]: ")
+
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+        <soap:Header>
+            <context xmlns="urn:zimbra">
+                <authToken>{token}</authToken>
+            </context>
+        </soap:Header>
+        <soap:Body>
+            <BatchRequest xmlns="urn:zimbra" onerror="continue">
+                <FolderActionRequest xmlns="urn:zimbraMail" requestId="0">
+                <action op="grant" id="{folder}">
+                <grant gt="usr" inh="1" d="{mailbox}" perm="rwidx" pw=""/>
+                </action>
+                </FolderActionRequest>
+            </BatchRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token,folder=folder,mailbox=mailbox),verify=False,timeout=15)
+        if r.status_code == 200 and 'zid' in r.text:        
+            pattern_id = re.compile(r"zid=\"(.*?)\"")
+            zid = pattern_id.findall(r.text)[0] 
+            print("[+] Add success")
+            print("    zid: %s"%(zid)) 
+        else:
+            print("[!]")
+            print(r.status_code)
+            print(r.text)
+
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 def deletemail_request(uri,token):
     id = input("[*] Input the item id of the mail:")
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -1547,6 +1590,80 @@ def deletemail_request(uri,token):
             print(r.text)    
     except Exception as e:
         print("[!] Error:%s"%(e))
+
+def exportmail_request(uri,token,mailbox):
+    url = uri + "/home/" + mailbox + "/?fmt=tgz"
+    print("[*] Advanced settings")
+    print("    You can set the following:")
+    print("    - start time:      eg:  2022-06-01")
+    print("                       eg:  null")
+    print("    - end   time:      eg:  2022-06-02")
+    print("    - search fileter:  eg:  content:keyword")
+    print("[*] Input the start time:")
+    starttime = input("[>]: ")
+    
+    if len(starttime) != 0:
+        if starttime != "null":
+            starttimelist = starttime.split('-')
+            import datetime, time
+            search1 = datetime.datetime(int(starttimelist[0]), int(starttimelist[1]), int(starttimelist[2]))
+            search1Toseconds = int(time.mktime(search1.timetuple()))
+            print("[*] Input the end time:")
+            endtime = input("[>]: ")
+            if len(endtime) != 0:
+                endtimelist = endtime.split('-')
+                search2 = datetime.datetime(int(endtimelist[0]), int(endtimelist[1]), int(endtimelist[2]))
+                search2Toseconds = int(time.mktime(search2.timetuple()))
+                url = url + "&start=" + str(search1Toseconds) + "000&end=" + str(search2Toseconds) + "000"
+            else:
+                url = url + "&start=" + str(search1Toseconds) + "000"
+        else:
+            print("[*] Search all time")    
+    else:
+        print("[*] Search all time")
+    print("[*] Input the search fileter:")
+    searchfileter = input("[>]: ")    
+    
+    from time import localtime, strftime
+    exporttime = strftime("%Y-%m-%d-%H%M%S", localtime())
+    filename = "All-" + str(exporttime)
+
+    url = url + "&query=" + searchfileter + "&filename=" + filename + "&emptyname=No+Data+to+Export&charset=UTF-8&callback=ZmImportExportController.exportErrorCallback__export1"
+    print("[*] Export url:" + url)
+    headers["Cookie"]="ZM_AUTH_TOKEN="+token+";"
+    r = requests.get(url,headers=headers,verify=False)
+
+    if r.status_code == 200:        
+        print("[*] Try to export the mail")
+        path = filename + ".tgz"        
+        with open(path, 'wb+') as file_object:
+            file_object.write(r.content)
+        print("[+] Save as " + path)
+    else:
+        print("[!]")
+        print(r.status_code)
+        print(r.text)
+
+def exportmailall_request(uri,token,mailbox):
+
+    from time import localtime, strftime
+    exporttime = strftime("%Y-%m-%d-%H%M%S", localtime())
+    filename = "All-" + str(exporttime)
+
+    url = uri + "/home/" + mailbox + "/?fmt=tgz&filename=" + filename + "&emptyname=No+Data+to+Export&charset=UTF-8&callback=ZmImportExportController.exportErrorCallback__export1"
+    headers["Cookie"]="ZM_AUTH_TOKEN="+token+";"
+    r = requests.get(url,headers=headers,verify=False)
+
+    if r.status_code == 200:        
+        print("[*] Try to export the mail")
+        path = filename + ".tgz"        
+        with open(path, 'wb+') as file_object:
+            file_object.write(r.content)
+        print("[+] Save as " + path)
+    else:
+        print("[!]")
+        print(r.status_code)
+        print(r.text)
 
 def getalladdresslists_request(uri,token):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -1667,6 +1784,39 @@ def getmsg_request(uri,token,id):
     except Exception as e:
         print("[!] Error:%s"%(e))
 
+def removeshare_request(uri,token):
+    print("[*] Input the zid:")
+    zid = input("[>]: ")
+    print("[*] Input the share folder:")
+    print("    2     Inbox")
+    print("    4     Junk")
+    print("    5     Sent")
+    print("    6     Drafts")
+    folder = input("[>]: ")
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+        <soap:Header>
+            <context xmlns="urn:zimbra">
+                <authToken>{token}</authToken>
+            </context>
+        </soap:Header>
+        <soap:Body>
+            <FolderActionRequest xmlns="urn:zimbraMail">
+            <action op="!grant" id="{folder}" zid="{zid}"/>
+            </FolderActionRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token,folder=folder,zid=zid),verify=False,timeout=15)
+        if r.status_code == 200:        
+            print("[+] Send success") 
+        else:
+            print("[!]")
+            print(r.status_code)
+            print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 def searchmail_request(uri,token):
     folder = input("[*] Input the folder(inbox/sent/trash):")
     size = input("[*] Input the size to serach:")
@@ -1711,6 +1861,37 @@ def searchmail_request(uri,token):
             data = pattern_data.findall(maildata[i])[0]
             data = str(datetime.fromtimestamp(int(data[:-3])))
             print("    UnixTime: " + data)      
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def sendsharenotification_request(uri,token):
+    print("[*] Input the target mailbox:")
+    mailbox = input("[>]: ")
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+        <soap:Header>
+            <context xmlns="urn:zimbra">
+                <authToken>{token}</authToken>
+            </context>
+        </soap:Header>
+        <soap:Body>
+            <SendShareNotificationRequest xmlns="urn:zimbraMail">
+            <item id="2"/>
+            <e a="{mailbox}"/>
+            <notes></notes>
+            </SendShareNotificationRequest>
+        </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token,mailbox=mailbox),verify=False,timeout=15)
+        if r.status_code == 200:   
+            print("[+] Send success")
+        elif r.status_code == 500 and 'no matching grant' in r.text:
+            print("[-] You should add share first.") 
+        else:
+            print("[!]")
+            print(r.status_code)
+            print(r.text)
     except Exception as e:
         print("[!] Error:%s"%(e))
 
@@ -1839,13 +2020,18 @@ def viewmail_request(uri,token):
 
 def usage_low():
     print("    Support command:")
+    print("      AddShare")    
     print("      DeleteMail")
+    print("      ExportMail")
+    print("      ExportMailAll")        
     print("      GetAllAddressLists")
     print("      GetContacts")
     print("      GetItem <path>,Eg:GetItem /Inbox")
     print("      GetMsg <MessageID>,Eg:GetMsg 259")
     print("      listallfoldersize")
+    print("      RemoveShare")
     print("      SearchMail")
+    print("      SendShareNotification")
     print("      SendTestMailToSelf")
     print("      uploadattachment")
     print("      uploadattachmentraw")
@@ -1935,8 +2121,14 @@ if __name__ == '__main__':
                 cmd = input("[$] ")
                 if cmd=='help':
                     usage_low()
+                elif cmd=='AddShare':    
+                    addshare_request(sys.argv[1],low_token)
                 elif cmd=='DeleteMail':    
                     deletemail_request(sys.argv[1],low_token)
+                elif cmd=='ExportMail':    
+                    exportmail_request(sys.argv[1],low_token,sys.argv[2])
+                elif cmd=='ExportMailAll':    
+                    exportmailall_request(sys.argv[1],low_token,sys.argv[2])                   
                 elif cmd=='GetAllAddressLists':
                     getalladdresslists_request(sys.argv[1],low_token)
                 elif cmd=='GetContacts':
@@ -1949,8 +2141,12 @@ if __name__ == '__main__':
                 elif 'GetMsg' in cmd:
                     cmdlist = cmd.split(' ')
                     getmsg_request(sys.argv[1],low_token,cmdlist[1])
+                elif cmd=='RemoveShare':    
+                    removeshare_request(sys.argv[1],low_token)                
                 elif cmd=='SearchMail':    
                     searchmail_request(sys.argv[1],low_token)
+                elif cmd=='SendShareNotification':    
+                    sendsharenotification_request(sys.argv[1],low_token)               
                 elif cmd=='SendTestMailToSelf':    
                     sendtestmailtoself_request(sys.argv[1],low_token,sys.argv[2])
                 elif cmd=='uploadattachment':    
