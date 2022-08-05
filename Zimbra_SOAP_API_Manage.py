@@ -2017,18 +2017,133 @@ def viewmail_request(uri,token):
         print(r.status_code)
         print(r.text)
 
+def addforward_request(uri,token):
+    print("[*] Input the mailbox to forward:")
+    print("    Eg. test1@test.com,test2@@test.com")
+    mailbox = input("[>]: ")
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+            <BatchRequest xmlns="urn:zimbra" onerror="stop">
+                <NoOpRequest xmlns="urn:zimbraMail" requestId="0"/>
+                <ModifyPrefsRequest xmlns="urn:zimbraAccount" requestId="1">
+                    <pref name="zimbraPrefMailForwardingAddress">{mailbox}</pref>
+                </ModifyPrefsRequest>
+            </BatchRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token,mailbox=mailbox),verify=False,timeout=15)
+        if r.status_code == 200:
+            print("[+] Add success")
+        else:    
+            print(r.status_code)
+            print(r.text)        
+        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getforward_request(uri,token):
+    try:
+        headers["Cookie"]="ZM_AUTH_TOKEN="+token+";"
+
+        r=requests.get(uri,headers=headers,verify=False,timeout=15)
+        if r.status_code == 200 and 'zimbraPrefMailForwardingAddress' in r.text:
+            print("[+] Forward")
+            pattern_name = re.compile(r"\"zimbraPrefMailForwardingAddress\":\"(.*?)\"")
+            name = pattern_name.findall(r.text)
+            print("    " + name[0])
+        else: 
+            print(r.status_code)
+            print("[-] No Forward")
+        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def getshare_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <GetFolderRequest xmlns="urn:zimbraMail"> 
+         </GetFolderRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token),verify=False,timeout=15)
+        if r.status_code == 200 and '<acl>' in r.text:
+            print("[+] Folder Share")
+            pattern_name = re.compile(r"<folder(.*?)</folder>")
+            folders = pattern_name.findall(r.text)
+            for i in range(len(folders)):
+                if '<acl>' in folders[i]:
+                    pattern_name = re.compile(r"name=\"(.*?)\"")
+                    name = pattern_name.findall(folders[i])
+                    pattern_name = re.compile(r"<acl>(.*?)</acl>")
+                    acl = pattern_name.findall(r.text) 
+                    print("    " + name[len(name)-1] + ":")
+                    print("    " + acl[0])
+        else:
+            print(r.status_code)
+            print(r.text)
+            print("[-] No Folder Share")     
+        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def removeforward_request(uri,token):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">
+               <authToken>{token}</authToken>
+           </context>
+       </soap:Header>
+       <soap:Body>
+            <BatchRequest xmlns="urn:zimbra" onerror="stop">
+                <NoOpRequest xmlns="urn:zimbraMail" requestId="0"/>
+                <ModifyPrefsRequest xmlns="urn:zimbraAccount" requestId="1">
+                    <pref name="zimbraPrefMailForwardingAddress"></pref>
+                </ModifyPrefsRequest>
+            </BatchRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(token=token),verify=False,timeout=15)
+        if r.status_code == 200:
+            print("[+] Remove success")
+        else:    
+            print(r.status_code)
+            print(r.text)        
+        
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
 
 def usage_low():
     print("    Support command:")
-    print("      AddShare")    
+    print("      AddForward")
+    print("      AddShare")
     print("      DeleteMail")
     print("      ExportMail")
-    print("      ExportMailAll")        
+    print("      ExportMailAll")
     print("      GetAllAddressLists")
     print("      GetContacts")
+    print("      GetForward")
     print("      GetItem <path>,Eg:GetItem /Inbox")
     print("      GetMsg <MessageID>,Eg:GetMsg 259")
+    print("      GetShare")
     print("      listallfoldersize")
+    print("      RemoveForward")
     print("      RemoveShare")
     print("      SearchMail")
     print("      SendShareNotification")
@@ -2121,6 +2236,8 @@ if __name__ == '__main__':
                 cmd = input("[$] ")
                 if cmd=='help':
                     usage_low()
+                elif cmd=='AddForward':    
+                    addforward_request(sys.argv[1],low_token)                   
                 elif cmd=='AddShare':    
                     addshare_request(sys.argv[1],low_token)
                 elif cmd=='DeleteMail':    
@@ -2133,14 +2250,20 @@ if __name__ == '__main__':
                     getalladdresslists_request(sys.argv[1],low_token)
                 elif cmd=='GetContacts':
                     getcontacts_request(sys.argv[1],low_token,sys.argv[2])
-                elif cmd=='listallfoldersize':
-                    getfolder_request(sys.argv[1],low_token)
+                elif cmd=='GetForward':
+                    getforward_request(sys.argv[1],low_token)                    
                 elif 'GetItem' in cmd:
                     cmdlist = cmd.split(' ')
                     getitem_request(sys.argv[1],low_token,cmdlist[1])
                 elif 'GetMsg' in cmd:
                     cmdlist = cmd.split(' ')
                     getmsg_request(sys.argv[1],low_token,cmdlist[1])
+                elif cmd=='GetShare':
+                    getshare_request(sys.argv[1],low_token)                    
+                elif cmd=='listallfoldersize':
+                    getfolder_request(sys.argv[1],low_token)
+                elif cmd=='RemoveForward':    
+                    removeforward_request(sys.argv[1],low_token)                                      
                 elif cmd=='RemoveShare':    
                     removeshare_request(sys.argv[1],low_token)                
                 elif cmd=='SearchMail':    
