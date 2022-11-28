@@ -35,8 +35,8 @@ if __name__ == '__main__':
         print('- search')
         print('- listfolder')
         print('Eg.')
-        print('%s 192.168.1.1 plaintext MYWINDOMAIN\\\\myuser user1@test.com password1 download'%(sys.argv[0]))
-        print('%s outlook.office365.com ntlmhash MYWINDOMAIN\\\\myuser user1@test.com c5a237b7e9d8e708d8436b6148a25fa1 search'%(sys.argv[0]))
+        print('%s 192.168.1.1 plaintext MYWINDOMAIN\\myuser user1@test.com password1 download'%(sys.argv[0]))
+        print('%s outlook.office365.com ntlmhash MYWINDOMAIN\\myuser user1@test.com c5a237b7e9d8e708d8436b6148a25fa1 search'%(sys.argv[0]))
         sys.exit(0)
     else:
         if sys.argv[6] == "download":
