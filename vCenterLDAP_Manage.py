@@ -21,7 +21,7 @@ def GetLDAPConfig():
     dcAccountDN = result[index2:].split('\n')[0].split('"')[2]
     
     index3 = result.find("dcAccountPassword")
-    dcAccountPassword = result[index3:].split('\n')[0].split()[2][1:-1].replace('\\"', '"')
+    dcAccountPassword = result[index3:].split('\n')[0].split(maxsplit=2)[2][1:-1].replace('\\"', '"')
     
     print("[+] dcAccount: " + dcAccount)
     print("[+] dcAccountDN: " + dcAccountDN)
