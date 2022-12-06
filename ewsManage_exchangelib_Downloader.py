@@ -116,12 +116,12 @@ if __name__ == '__main__':
                 print(str(flag), end=",")
                 flag = flag + 1
 
-                with open(path2 + "\\" + item.id, "w") as fw:
+                with open(path2 + "\\" + escape2(item.id[-16:]), "w", encoding='utf-8') as fw:
                     fw.write(str(item).replace('\\r\\n','\r\n'))
 
                 for attachment in item.attachments:
                     if isinstance(attachment, FileAttachment):
-                        filename = path2 + "\\" + str(item.id) + attachment.name
+                        filename = path2 + "\\" + str(escape2(item.id[-16:])) + attachment.name
                         print('\n[+] %s'%(item.id))
                         print("    Save attachment: %s"%str(attachment.name))
                         with open(filename, "wb") as fw:
@@ -162,12 +162,12 @@ if __name__ == '__main__':
                     print(str(flag), end=",")
                     flag = flag + 1
 
-                    with open(path2 + "\\" + item.id, "w") as fw:
+                    with open(path2 + "\\" + escape2(item.id[-16:]), "w", encoding='utf-8') as fw:
                         fw.write(str(item).replace('\\r\\n','\r\n'))
 
                     for attachment in item.attachments:
                         if isinstance(attachment, FileAttachment):
-                            filename = path2 + "\\" + str(item.id) + attachment.name
+                            filename = path2 + "\\" + str(escape2(item.id[-16:])) + attachment.name
                             print('\n[+] %s'%(item.id))
                             print("    Save attachment: %s"%str(attachment.name))
                             with open(filename, "wb") as fw:
@@ -180,12 +180,12 @@ if __name__ == '__main__':
                     print(str(flag), end=",")
                     flag = flag + 1
 
-                    with open(path2 + "\\" + item.id, "w") as fw:
+                    with open(path2 + "\\" + escape2(item.id[-16:]), "w", encoding='utf-8') as fw:
                         fw.write(str(item).replace('\\r\\n','\r\n'))
 
                     for attachment in item.attachments:
                         if isinstance(attachment, FileAttachment):
-                            filename = path2 + "\\" + str(item.id) + attachment.name
+                            filename = path2 + "\\" + str(escape2(item.id[-16:])) + attachment.name
                             print('\n[+] %s'%(item.id))
                             print("    Save attachment: %s"%str(attachment.name))
                             with open(filename, "wb") as fw:
@@ -220,12 +220,12 @@ if __name__ == '__main__':
                         print(str(flag), end=",")
                         flag = flag + 1
 
-                        with open(path2 + "\\" + item.id, "w") as fw:
+                        with open(path2 + "\\" + escape2(item.id[-16:]), "w", encoding='utf-8') as fw:
                             fw.write(str(item).replace('\\r\\n','\r\n'))
 
                         for attachment in item.attachments:
                             if isinstance(attachment, FileAttachment):
-                                filename = path2 + "\\" + str(item.id) + attachment.name
+                                filename = path2 + "\\" + str(escape2(item.id[-16:])) + attachment.name
                                 print('\n[+] %s'%(item.id))
                                 print("    Save attachment: %s"%str(attachment.name))
                                 with open(filename, "wb") as fw:
@@ -239,12 +239,12 @@ if __name__ == '__main__':
                         print(str(flag), end=",")
                         flag = flag + 1
 
-                        with open(path2 + "\\" + item.id, "w") as fw:
+                        with open(path2 + "\\" + escape2(item.id[-16:]), "w", encoding='utf-8') as fw:
                             fw.write(str(item).replace('\\r\\n','\r\n'))
 
                         for attachment in item.attachments:
                             if isinstance(attachment, FileAttachment):
-                                filename = path2 + "\\" + str(item.id) + attachment.name
+                                filename = path2 + "\\" + str(escape2(item.id[-16:])) + attachment.name
                                 print('\n[+] %s'%(item.id))
                                 print("    Save attachment: %s"%str(attachment.name))
                                 with open(filename, "wb") as fw:
@@ -267,7 +267,6 @@ if __name__ == '__main__':
 
         else:
             print("[!] Wrong input")
-
 
 
 
